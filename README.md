@@ -2,5 +2,5 @@
 
 # Contributors
 * Tyson Cox
-*Tyler Dodd
+* Tyler Dodd
 
