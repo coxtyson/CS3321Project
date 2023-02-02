@@ -13,6 +13,7 @@ public class Product {
         this.price = price;
     }
 
+    //create a product from an existing line item
     public Product(LineItem item, int quantity)
     {
         this(item.getName(), item.getSize(), quantity, item.getPrice());
