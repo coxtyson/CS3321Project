@@ -10,5 +10,4 @@ public class App {
         UI userinterface = new UI();
         Application.launch(userinterface.getClass());
     }
-
 }
