@@ -31,6 +31,7 @@ application {
 }
 
 javafx {
+    version = "19"
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
