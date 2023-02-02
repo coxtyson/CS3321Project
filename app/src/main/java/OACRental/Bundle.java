@@ -7,13 +7,13 @@ public class Bundle {
     private Price price;
     private List<LineItem> items;
 
-    public Bundle(String n, Price p, List<LineItem> i){
-        name = n;
-        price = p;
-        items = i;
+    public Bundle(String name, Price price, List<LineItem> items){
+        this.name = name;
+        this.price = price;
+        this.items = items;
     }
 
-    public List<LineItem> getItems() { return items; }
-    public Price getPrice() { return price; }
-    public String getName() { return name; }
+    public List<LineItem> getItems() { return this.items; }
+    public Price getPrice() { return this.price; }
+    public String getName() { return this.name; }
 }

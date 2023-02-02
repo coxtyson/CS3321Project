@@ -7,12 +7,12 @@ public class Customer {
     private String Phone;
     private String Email;
 
-    public Customer(String first, String last, String IDnum, String phone, String email){
-        FirstName = first;
-        LastName = last;
-        ID = IDnum;
-        Phone = phone;
-        Email = email;
+    public Customer(String FirstName, String LastName, String ID, String Phone, String Email){
+        this.FirstName = FirstName;
+        this.LastName = LastName;
+        this.ID = ID;
+        this.Phone = Phone;
+        this.Email = Email;
     }
 
     public String getFullName(){ return FirstName + " " + LastName; }
