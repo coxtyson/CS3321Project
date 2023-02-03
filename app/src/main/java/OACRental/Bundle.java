@@ -8,8 +8,9 @@ public class Bundle {
     private Price price;
     private List<LineItem> items;
 
+
     public Bundle(String n, Price p, List<LineItem> i) {
-        name = n;
+        this.name = n;
         price = p;
         items = i;
     }
@@ -25,6 +26,8 @@ public class Bundle {
     public String getName() {
         return name;
     }
+
+
 }
 
 

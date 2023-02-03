@@ -8,6 +8,7 @@ public class Customer {
     private String Phone;
     private String Email;
 
+
     public Customer(String first, String last, String IDnum, String phone, String email) {
         FirstName = first;
         LastName = last;
