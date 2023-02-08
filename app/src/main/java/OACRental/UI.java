@@ -9,7 +9,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.net.URL;
 
 public class UI extends Application {
     ArrayList<TaskView> tasks;
@@ -55,6 +60,9 @@ public class UI extends Application {
         primaryStage.setTitle("OAC Rental");
 
         Scene scene = initUI();
+
+        scene.getStylesheets().add("style.css");
+
         primaryStage.setScene(scene);
         primaryStage.show();
     }

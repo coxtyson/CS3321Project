@@ -1,0 +1,6 @@
+.root {
+  -fx-accent: #c93046;
+  -fx-default-button: #fd7088;
+  -fx-focus-color: #e3305d;
+  -fx-faint-focus-color: #e3305d22;
+}
