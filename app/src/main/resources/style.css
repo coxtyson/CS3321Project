@@ -4,3 +4,10 @@
   -fx-focus-color: #e3305d;
   -fx-faint-focus-color: #e3305d22;
 }
+
+#hboxMainNavButtons {
+}
+
+#pageCustomer {
+    -fx-padding: 50;
+}
