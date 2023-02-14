@@ -17,5 +17,10 @@ package OACRental;
 * */
 
 public class DataManager {
-
+    private Customer CurrentCustomer;
+    public void SetCustomer(Customer newCustomer){ CurrentCustomer = newCustomer;}
+    public Customer GetCustomer(){ return CurrentCustomer; }
+    public void NewCustomer(String firstName, String lastName, String idNum, String phone, String email){
+        CurrentCustomer = new Customer(firstName, lastName, idNum, phone, email);
+    }
 }
