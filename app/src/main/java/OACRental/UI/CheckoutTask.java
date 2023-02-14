@@ -4,7 +4,7 @@ public class CheckoutTask extends TaskView {
 
     public CheckoutTask() {
         addPage(new CustomerAddPage(this));
-        addPage(new ItemRentPage());
+        addPage(new ItemRentPage(this));
         jumpPage(0);
     }
 
