@@ -60,4 +60,13 @@ public class Customer {
     public String getID() {
         return ID;
     }
+
+    public boolean equals(Customer compareTo)
+    {
+        if(this.FirstName == compareTo.getFirstName() && this.LastName == compareTo.getLastName() && this.ID == compareTo.getID()
+        && this.Phone == compareTo.getPhone() && this.Email == compareTo.getEmail()){
+            return true;
+        }
+        else{return false;}
+    }
 }

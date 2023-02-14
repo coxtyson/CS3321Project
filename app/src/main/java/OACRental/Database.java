@@ -14,6 +14,13 @@ public interface Database {
         public void addProduct(Product product);
         public void updateProduct(Product productOriginal, Product productUpdated);
 
+        //public Customer getCustomer(String first, String last, String ID, String phone, String email){
+                //check for first & last match in database
+                //check for ID matches in database
+                //check for phone number match in database
+                //check for email match in database
+
+       //}
 
 
 }
