@@ -47,12 +47,6 @@ public class DataManager {
         //runs getCustomer until 2 customers are equal or it runs 10 times
 
     }
-    public static void getCustomer(String first, String last, String ID, String phone, String email){
-        //check for first & last matches in database
-        //check for ID matches in database
-        //check for phone number match in database
-        //check for email match in database
-    }
     public static void getLineItem(String itemName){}
     public static void getBundle(String bundleName){}
     public static void getTransactionRecords(){}
@@ -67,5 +61,13 @@ public class DataManager {
     }
     public static void setAdmin(){}
 
+
+
+    private Customer CurrentCustomer;
+    public void SetCustomer(Customer newCustomer){ CurrentCustomer = newCustomer;}
+    public Customer GetCustomer(){ return CurrentCustomer; }
+    public void NewCustomer(String firstName, String lastName, String idNum, String phone, String email){
+        CurrentCustomer = new Customer(firstName, lastName, idNum, phone, email);
+    }
 
 }
