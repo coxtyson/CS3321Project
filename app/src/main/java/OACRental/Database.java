@@ -10,8 +10,10 @@ public interface Database {
         public List<TransactionRecord> retrieveTransactionRecords(Customer customer);
         public List<TransactionRecord> retrieveTransactionRecords(Customer customer, Date startDate, Date endDate);
         public List<TransactionRecord> retrieveTransactionRecords(Date startDate, Date endDate);
-        public Product retrieveProduct();
-
+        public Product retrieveProduct(String name);
+        public List<Product> bundleToComponents(String name);
+        public List<Product> bundleToComponents(Product product);
+        public List<Product> getAllProducts();
         public void addCustomer(Customer customer);
         public void addProduct(Product product);
         public void updateProduct(Product productOriginal, Product productUpdated);
