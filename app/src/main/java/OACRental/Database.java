@@ -11,6 +11,7 @@ public interface Database {
         public List<TransactionRecord> retrieveTransactionRecords(Customer customer, Date startDate, Date endDate);
         public List<TransactionRecord> retrieveTransactionRecords(Date startDate, Date endDate);
         public Product retrieveProduct();
+        public List<Product> getAllProducts();
 
         public void addCustomer(Customer customer);
         public void addProduct(Product product);

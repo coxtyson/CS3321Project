@@ -60,4 +60,9 @@ public class MariaDB implements Database {
     public void updateProduct(Product productOriginal, Product productUpdated) {
 
     }
+
+    @Override
+    public List<Product> getAllProducts(){
+        return null;
+    }
 }
