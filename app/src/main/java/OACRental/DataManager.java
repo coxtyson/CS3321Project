@@ -25,7 +25,7 @@ public class DataManager {
 
     /*AddCustomer*/
 
-    private static Database database;
+    private static MariaDB database;
     private static List<Customer> prepopulatedCustomers;   //a list of potential customers created by database query when  entering a name in the CustomerAddPage
 
 

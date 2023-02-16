@@ -62,7 +62,6 @@ public class MariaDB implements Database {
     }
 
     @Override
-<<<<<<< HEAD
     public List<Product> bundleToComponents(String name){
         return null;
     }
