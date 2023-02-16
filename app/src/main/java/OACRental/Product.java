@@ -5,6 +5,7 @@ public class Product {
     private String size;
     private int quantity;
     private Price price;
+    private boolean isBundle;
 
     public Product(String name, String size, int quantity, Price price){
         this.name = name;
@@ -33,5 +34,13 @@ public class Product {
 
     public Price getPrice(){
         return this.price;
+    }
+
+    public boolean isBundle() {
+        return isBundle;
+    }
+
+    public void setBundle(boolean bundle) {
+        isBundle = bundle;
     }
 }

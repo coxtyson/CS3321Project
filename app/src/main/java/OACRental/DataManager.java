@@ -19,47 +19,67 @@ import java.util.List;
 public class DataManager {
     /*CUSTOMER TRANSACTION INTERACTION DATA*/
     /*Global*/
-    private Cart cart; //cart containing all items the current customer has selected to rent
-    private Customer activeCustomer;    //the current active customer
-    private Transaction activeTransaction;  //the current active transaction
+    private static Cart cart; //cart containing all items the current customer has selected to rent
+    private static Customer activeCustomer;    //the current active customer
 
     /*AddCustomer*/
+
+    private static Database database;
     private static List<Customer> prepopulatedCustomers;   //a list of potential customers created by database query when  entering a name in the CustomerAddPage
 
-    /*Inventory*/
-    private static boolean isAdmin; //
 
     /*Handle access to the current customer in the UI layer*/
-    public static void setActiveCustomer(){}
-    public static void getActiveCustomer(){}
-
-    /*Handle access to the current transaction in the UI layer*/
-    public static void getActiveTransaction(){}
-    public static void getCart(){}
-    public static void setCart(){}
-    public static void clearActiveTransaction(){}
-
-    /*Handle access to the database*/
-    public static List<Customer> getPrepopulatedCustomers(){
-        return prepopulatedCustomers;
+    public static void setActiveCustomer(Customer customer) {
+        activeCustomer = customer;
     }
-    public static void setPrepopulatedCustomers(){
-        //runs getCustomer until 2 customers are equal or it runs 10 times
+    public static Customer getActiveCustomer() {
+        return activeCustomer;
+    }
+
+    public static Cart getCart() {
+        return cart;
+    }
+    public static void setCart() {
 
     }
-    public static void getLineItem(String itemName){}
+    public static void clearActiveTransaction() {
+        cart.clear();
+    }
+
+    public List<Customer> searchCustomers(String first, String last, String phone, String id, String email) {
+        return database.retrieveCustomers(first, last, phone, id, email);
+    }
+
+    public static void createCustomer(String first, String last, String ID, String phone, String email) {
+        if(database.retrieveCustomer(first, last, ID, phone, email) == null){
+            Customer newCustomer = new Customer(first, last, ID, phone, email);
+            setActiveCustomer(newCustomer);
+            database.addCustomer(newCustomer);
+        }
+    }
+
+    public static void addProductToCart(Product product) {
+        // 1. determine if item or bundle
+        // 2. Construct item/bundle from product
+        // 3. Insert into cart
+
+        // addendum: when the cart is finished (transaction complete) reduce database qty by cart contents
+    }
+
+    public static List<Product> getAllProducts() {
+        //return database.getAllProducts();
+        return null;
+    }
+
+
+    public static void getLineItem(String itemName) {
+    }
     public static void getBundle(String bundleName){}
     public static void getTransactionRecords(){}
-    public static void createCustomer(String first, String last, String ID, String phone, String email){
-    }
 
     /*Settings management*/
     public static void getSettingsConfig(){}
     public static void setSettingsConfig(){}
-    public static boolean isAdmin(){
-        return isAdmin;
-    }
-    public static void setAdmin(){}
 
 
 

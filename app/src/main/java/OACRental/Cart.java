@@ -5,4 +5,17 @@ import java.util.List;
 public class Cart {
     public List<Bundle> bundles;
     public List<LineItem> lineItems;
+
+    public void clear() {
+        bundles.clear();
+        lineItems.clear();
+    }
+
+    public void insert(LineItem item) {
+        lineItems.add(item);
+    }
+
+    public void insert(Bundle bundle) {
+        bundles.add(bundle);
+    }
 }

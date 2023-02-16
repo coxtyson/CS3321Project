@@ -17,7 +17,7 @@ public class MariaDB implements Database {
 
     @Override
     public List<Customer> retrieveCustomers(String firstName, String lastName, String phone, String ID, String email) {
-
+        return null;
     }
 
 

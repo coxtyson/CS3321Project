@@ -1,4 +1,5 @@
 package OACRental;
+
 import java.util.List;
 import java.util.Date;
 public interface Database {
@@ -10,6 +11,7 @@ public interface Database {
         public List<TransactionRecord> retrieveTransactionRecords(Customer customer, Date startDate, Date endDate);
         public List<TransactionRecord> retrieveTransactionRecords(Date startDate, Date endDate);
         public Product retrieveProduct();
+
         public void addCustomer(Customer customer);
         public void addProduct(Product product);
         public void updateProduct(Product productOriginal, Product productUpdated);
