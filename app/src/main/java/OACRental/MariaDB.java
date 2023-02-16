@@ -81,8 +81,8 @@ public class MariaDB implements Database {
     }
 
     @Override
-    public Product retrieveProduct() {
-        String sql = "SELECT * FROM TABLE Products";
+    public Product retrieveProduct(String name) {
+        String sql = "SELECT * FROM TABLE Products WHERE NAME=(?)";
         return null;
     }
 
@@ -99,5 +99,22 @@ public class MariaDB implements Database {
     @Override
     public void updateProduct(Product productOriginal, Product productUpdated) {
 
+    }
+
+    @Override
+    public List<Product> bundleToComponents(String name){
+        return null;
+    }
+
+    @Override
+    public List<Product> bundleToComponents(Product bundle)
+    {
+        return null;
+    }
+
+    @Override
+    public List<Product> getAllProducts()
+    {
+        return null;
     }
 }

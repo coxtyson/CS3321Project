@@ -1,5 +1,6 @@
 package OACRental;
 import java.util.List;
+import java.util.Date;
 /*
 * Customer
 *   1. Search for a customer
@@ -19,7 +20,7 @@ import java.util.List;
 public class DataManager {
     /*CUSTOMER TRANSACTION INTERACTION DATA*/
     /*Global*/
-    private static Cart cart; //cart containing all items the current customer has selected to rent
+    private static List<Product> cart; //cart containing all items the current customer has selected to rent
     private static Customer activeCustomer;    //the current active customer
 
     /*AddCustomer*/
@@ -36,11 +37,11 @@ public class DataManager {
         return activeCustomer;
     }
 
-    public static Cart getCart() {
+    public static List<Product> getCart() {
         return cart;
     }
-    public static void setCart() {
-
+    public static void setCart(Product product) {
+        cart.add(product);
     }
     public static void clearActiveTransaction() {
         cart.clear();
@@ -58,36 +59,33 @@ public class DataManager {
         }
     }
 
-    public static void addProductToCart(Product product) {
-        // 1. determine if item or bundle
-        // 2. Construct item/bundle from product
-        // 3. Insert into cart
-
+    public static void addProductToCart(String name) {
+        // 1. determine if product exists / is in current inventory
+        Product product = database.retrieveProduct(name);
+        if( product == null)
+        {
+            throw new Error("Product not found");
+        }
+        else if(product.getQuantity() == 0) {
+            throw new Error("Out of stock");
+        }
+        cart.add(product);
         // addendum: when the cart is finished (transaction complete) reduce database qty by cart contents
     }
 
     public static List<Product> getAllProducts() {
-        //return database.getAllProducts();
-        return null;
+        return database.getAllProducts();
     }
 
+    public static List<TransactionRecord> getTransactionRecords(Customer customer){
+        return database.retrieveTransactionRecords(customer);
 
-    public static void getLineItem(String itemName) {
     }
-    public static void getBundle(String bundleName){}
-    public static void getTransactionRecords(){}
-
-    /*Settings management*/
-    public static void getSettingsConfig(){}
-    public static void setSettingsConfig(){}
-
-
-
-    private Customer CurrentCustomer;
-    public void SetCustomer(Customer newCustomer){ CurrentCustomer = newCustomer;}
-    public Customer GetCustomer(){ return CurrentCustomer; }
-    public void NewCustomer(String firstName, String lastName, String idNum, String phone, String email){
-        CurrentCustomer = new Customer(firstName, lastName, idNum, phone, email);
+    public static List<TransactionRecord> getTransactionRecords(Customer customer, Date startDate, Date endDate){
+        return database.retrieveTransactionRecords(customer, startDate, endDate);
+    }
+    public static List<TransactionRecord> getTransactionRecords(Date startDate, Date endDate){
+        return database.retrieveTransactionRecords(startDate, endDate);
     }
 
 }
