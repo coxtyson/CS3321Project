@@ -1,5 +1,6 @@
 package OACRental;
 import java.util.List;
+import java.util.Date;
 /*
 * Customer
 *   1. Search for a customer
@@ -39,8 +40,8 @@ public class DataManager {
     public static List<Product> getCart() {
         return cart;
     }
-    public static void setCart() {
-
+    public static void setCart(Product product) {
+        cart.add(product);
     }
     public static void clearActiveTransaction() {
         cart.clear();
@@ -73,28 +74,18 @@ public class DataManager {
     }
 
     public static List<Product> getAllProducts() {
-        //return database.getAllProducts();
-        return null;
+        return database.getAllProducts();
     }
 
-
-    public static void getLineItem(String itemName) {
+    public static List<TransactionRecord> getTransactionRecords(Customer customer){
+        return database.retrieveTransactionRecords(customer);
 
     }
-    public static void getBundle(String bundleName){}
-    public static void getTransactionRecords(){}
-
-    /*Settings management*/
-    public static void getSettingsConfig(){}
-    public static void setSettingsConfig(){}
-
-
-
-    private Customer CurrentCustomer;
-    public void SetCustomer(Customer newCustomer){ CurrentCustomer = newCustomer;}
-    public Customer GetCustomer(){ return CurrentCustomer; }
-    public void NewCustomer(String firstName, String lastName, String idNum, String phone, String email){
-        CurrentCustomer = new Customer(firstName, lastName, idNum, phone, email);
+    public static List<TransactionRecord> getTransactionRecords(Customer customer, Date startDate, Date endDate){
+        return database.retrieveTransactionRecords(customer, startDate, endDate);
+    }
+    public static List<TransactionRecord> getTransactionRecords(Date startDate, Date endDate){
+        return database.retrieveTransactionRecords(startDate, endDate);
     }
 
 }
