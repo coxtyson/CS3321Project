@@ -1,6 +1,5 @@
 package OACRental.UI;
 
-import javafx.concurrent.Task;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -13,7 +12,5 @@ public class ItemRentPage extends BorderPane {
 
         GridPane grdProducts = new GridPane();
         StackPane stkCart = new StackPane();
-
-
     }
 }
