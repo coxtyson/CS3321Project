@@ -1,6 +1,8 @@
 package OACRental.UI;
 
 
+import OACRental.DataManager;
+import OACRental.SettingsManager;
 import javafx.application.Application;
 import javafx.scene.layout.*;
 import javafx.scene.Node;
@@ -105,6 +107,23 @@ public class UI extends Application {
         scene.getStylesheets().add("style.css");
 
         primaryStage.setScene(scene);
+
+        SettingsManager.loadOrCreateSettings();
+
+        try {
+            DataManager.connectToDatabase(
+                    (String) SettingsManager.getSetting("database-url"),
+                    (int) SettingsManager.getSetting("database-port"),
+                    (String) SettingsManager.getSetting("database-name"),
+                    (String) SettingsManager.getSetting("database-username"),
+                    (String) SettingsManager.getSetting("database-password")
+            );
+        }
+        catch (Exception ex) {
+            System.out.println("Failed initial connection to database with reason:");
+            System.out.println(ex.getMessage());
+        }
+
         primaryStage.show();
     }
 }

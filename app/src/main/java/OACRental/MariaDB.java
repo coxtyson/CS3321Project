@@ -2,24 +2,51 @@ package OACRental;
 
 import java.sql.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class MariaDB implements Database {
+    private static final int timeoutSeconds = 5;
     private Connection connection;
 
-    public MariaDB(String url, String username, String password) {
+    public MariaDB(String url, int port, String databaseName, String username, String password) {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
-            connection = DriverManager.getConnection(url,username, password);
 
-            if (!connection.isValid(5)) {
+            String path = "jdbc:mysql://" + url + ":" + port + "/" + databaseName;
+
+            connection = DriverManager.getConnection(path,username, password);
+
+            if (!connection.isValid(timeoutSeconds)) {
                 throw new Exception("MariaDB connection failed");
             }
         }
         catch (Exception ex) {
-            System.out.println("Connection failed");
+            System.out.println("Mariadb connection failed with reason:");
+            System.out.println(ex.getMessage());
             connection = null;
+        }
+    }
+
+    @Override
+    public boolean isConnected() {
+        try {
+            return connection != null && connection.isValid(timeoutSeconds);
+        }
+        catch (Exception ex) {
+            return false;
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            connection.close();
+        }
+        catch (Exception ex) {
+            System.out.println("Failed to close database connection with reason: ");
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -33,9 +60,90 @@ public class MariaDB implements Database {
         return null;
     }
 
+
+    private void appendCustomersFromResults(List<Customer> list, ResultSet results) throws SQLException {
+        while (results.next()) {
+            int custid = results.getInt("ID");
+            String first = results.getString("FirstName");
+            String last = results.getString("LastName");
+            String id = results.getString("Identification");
+            String phone = results.getString("Phone");
+            String email = results.getString("Email");
+
+            Customer cm = new Customer(custid, first, last, id, phone, email);
+
+            boolean present = false;
+            for (Customer cust : list) {
+                if (cm.equals(cust)) {
+                    present = true;
+                    break;
+                }
+            }
+
+            if (!present) {
+                list.add(cm);
+            }
+        }
+    }
+
+    /**
+     * Search the database for a list of customers matching some criterion
+     * @param firstName Nullable - the customer's first name
+     * @param lastName Nullable - the customer's last name
+     * @param phone Nullable - the customer's phone number
+     * @param ID Nullable - the customer's bengal id/driver's license
+     * @param email Nullable - the customer's email
+     * @return a list of customer's matching all criterion
+     */
     @Override
     public List<Customer> retrieveCustomers(String firstName, String lastName, String phone, String ID, String email) {
-        return null;
+        List<Customer> custs = new ArrayList<>();
+
+        if (firstName != null && !firstName.isEmpty()) {
+            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE FirstName LIKE (?)")) {
+                stmt.setString(1, firstName);
+                stmt.execute();
+                appendCustomersFromResults(custs, stmt.getResultSet());
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
+            }
+        }
+
+        if (lastName != null && ! lastName.isEmpty()) {
+            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE LastName LIKE (?)")) {
+                stmt.setString(1, lastName);
+                stmt.execute();
+                appendCustomersFromResults(custs, stmt.getResultSet());
+            } catch (Exception ignored) {}
+        }
+
+        if (phone != null && !phone.isEmpty()) {
+            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE Phone LIKE (?)")) {
+                stmt.setString(1, phone);
+                stmt.execute();
+                appendCustomersFromResults(custs, stmt.getResultSet());
+            } catch (Exception ignored) {}
+        }
+
+        if (ID != null && !ID.isEmpty()) {
+            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE Identification LIKE (?)")) {
+                stmt.setString(1, ID);
+                stmt.execute();
+                appendCustomersFromResults(custs, stmt.getResultSet());
+            }
+            catch (Exception ignored) {}
+        }
+
+        if (email != null && !email.isEmpty()) {
+            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE Email LIKE (?)")) {
+                stmt.setString(1, email);
+                stmt.execute();
+                appendCustomersFromResults(custs, stmt.getResultSet());
+            }
+            catch (Exception ignored) {}
+        }
+
+        return custs;
     }
 
 
@@ -60,6 +168,8 @@ public class MariaDB implements Database {
             System.out.println(ex.toString());
         }
         */
+
+        return null;
     }
 
     @Override
@@ -70,7 +180,6 @@ public class MariaDB implements Database {
     @Override
     public List<TransactionRecord> retrieveTransactionRecords(Customer customer, Date startDate, Date endDate) {
         String sql = "SELECT * FROM TABLE Transactions WHERE CustID=(?) AND Checkout BETWEEN (?) AND (?)";
-
         return null;
     }
 
@@ -102,19 +211,17 @@ public class MariaDB implements Database {
     }
 
     @Override
-    public List<Product> bundleToComponents(String name){
+    public List<Product> bundleToComponents(String name) {
         return null;
     }
 
     @Override
-    public List<Product> bundleToComponents(Product bundle)
-    {
+    public List<Product> bundleToComponents(Product bundle) {
         return null;
     }
 
     @Override
-    public List<Product> getAllProducts()
-    {
+    public List<Product> getAllProducts() {
         return null;
     }
 }

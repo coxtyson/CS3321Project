@@ -29,10 +29,35 @@ public class DataManager {
     private static List<Customer> prepopulatedCustomers;   //a list of potential customers created by database query when  entering a name in the CustomerAddPage
 
 
-    /*Handle access to the current customer in the UI layer*/
+    /**
+     * Connect to a database
+     * @param url the url of the database to connect to
+     * @param username the name of the database user to connect with
+     * @param password the user's password
+     */
+    public static void connectToDatabase(String url, int port, String datbaseName, String username, String password) {
+        if (database != null && database.isConnected()) {
+            database.close();
+        }
+
+        // Hard-coded instantiation of a mariadb database
+        // refactor into a factory design down the line if new connections required
+        database = new MariaDB(url, port, datbaseName, username, password);
+    }
+
+
+    /**
+     * Set the active customer
+     * @param customer the customer
+     */
     public static void setActiveCustomer(Customer customer) {
         activeCustomer = customer;
     }
+
+    /**
+     * Get the active customer
+     * @return the active customer, or null if not set
+     */
     public static Customer getActiveCustomer() {
         return activeCustomer;
     }
@@ -47,7 +72,7 @@ public class DataManager {
         cart.clear();
     }
 
-    public List<Customer> searchCustomers(String first, String last, String phone, String id, String email) {
+    public static List<Customer> searchCustomers(String first, String last, String phone, String id, String email) {
         return database.retrieveCustomers(first, last, phone, id, email);
     }
 

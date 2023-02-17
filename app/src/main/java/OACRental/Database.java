@@ -3,6 +3,10 @@ package OACRental;
 import java.util.List;
 import java.util.Date;
 public interface Database {
+
+        boolean isConnected();
+        void close();
+
         public Customer retrieveCustomer(Customer customer);
         public Customer retrieveCustomer(String firstName, String lastName, String phone, String ID, String email);
         public List<Customer> retrieveCustomers(String firstName, String lastName, String phone, String ID, String email);
@@ -15,8 +19,6 @@ public interface Database {
         public List<Product> bundleToComponents(String name);
         public List<Product> bundleToComponents(Product product);
         public List<Product> getAllProducts();
-
-        public Product retrieveProduct();
 
 
 

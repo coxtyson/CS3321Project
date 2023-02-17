@@ -1,5 +1,6 @@
 package OACRental.UI;
 
+import OACRental.Customer;
 import OACRental.DataManager;
 import javafx.beans.Observable;
 import javafx.beans.value.ObservableValue;
@@ -15,12 +16,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import javax.xml.crypto.Data;
+import java.util.List;
+
 public class CustomerAddPage extends BorderPane {
     TextField txtFirstName;
     TextField txtLastName;
     TextField txtID;
     TextField txtPhone;
     TextField txtEmail;
+
+    HBox hbFoundCustomers;
 
     TaskView parent;
 
@@ -76,15 +82,31 @@ public class CustomerAddPage extends BorderPane {
 
         setCenter(textBoxes);
 
-        HBox foundcusts = new HBox();
-        foundcusts.getChildren().add(new Button("Guy with really long name\nID: 29272"));
+        hbFoundCustomers = new HBox();
+        hbFoundCustomers.setId("hbFoundCustomers");
+        hbFoundCustomers.getChildren().add(new Button("Guy with really long name\nID: 29272"));
 
-        setRight(foundcusts);
-        setMargin(foundcusts, new Insets(0, 0, 0, 20));
+        setRight(hbFoundCustomers);
+        setMargin(hbFoundCustomers, new Insets(0, 0, 0, 20)); // TODO: move this to style.css
     }
 
     private void onType() {
         // DataManager - lookup customers, generate button
+
+        List<Customer> matches = DataManager.searchCustomers(
+                txtFirstName.getText(),
+                txtLastName.getText(),
+                txtID.getText(),
+                txtPhone.getText(),
+                txtEmail.getText()
+        );
+
+        hbFoundCustomers.getChildren().clear();
+
+        for (Customer cust : matches) {
+            Button btn = new Button(String.format("%s %s\n%s", cust.getFirstName(), cust.getLastName(), cust.getID()));
+            hbFoundCustomers.getChildren().add(btn);
+        }
     }
 
     private void createCustomer() {
