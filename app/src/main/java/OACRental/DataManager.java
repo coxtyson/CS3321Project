@@ -32,17 +32,19 @@ public class DataManager {
     /**
      * Connect to a database
      * @param url the url of the database to connect to
+     * @param port the port to connect on
+     * @param databaseName the name of the database on the server to connect to
      * @param username the name of the database user to connect with
      * @param password the user's password
      */
-    public static void connectToDatabase(String url, int port, String datbaseName, String username, String password) {
+    public static void connectToDatabase(String url, int port, String databaseName, String username, String password) {
         if (database != null && database.isConnected()) {
             database.close();
         }
 
         // Hard-coded instantiation of a mariadb database
         // refactor into a factory design down the line if new connections required
-        database = new MariaDB(url, port, datbaseName, username, password);
+        database = new MariaDB(url, port, databaseName, username, password);
     }
 
 
