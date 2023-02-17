@@ -20,8 +20,6 @@ public interface Database {
         public List<Product> bundleToComponents(Product product);
         public List<Product> getAllProducts();
 
-
-
         public void addCustomer(Customer customer);
         public void addProduct(Product product);
         public void updateProduct(Product productOriginal, Product productUpdated);

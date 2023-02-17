@@ -6,20 +6,27 @@ public class Product {
     private int quantity;
     private Price price;
     private boolean isBundle;
+    private boolean bundleOnly;
+    private String itemsInBundle;
 
-    public Product(String name, String size, int quantity, Price price){
+    /*Base constructor for products that are not bundles*/
+    public Product(String name, String size, int quantity, Price price, boolean bundleOnly){
         this.name = name;
         this.size = size;
         this.quantity = quantity;
         this.price = price;
+        this.bundleOnly = bundleOnly;
+        this.isBundle = false;
     }
 
-    //create a product from an existing line item
-    public Product(LineItem item, int quantity)
+    /*Product constructor for a product that does not have a size*/
+    public Product(String name, int quantity, Price price, boolean bundleOnly)
     {
-        this(item.getName(), item.getSize(), quantity, item.getPrice());
+        this(name, null, quantity, price, bundleOnly);
     }
 
+    /*Constructor for products that are bundles*/
+    public Product(String name, String items, Price price, boolean isBundle){}
     public String getName(){
         return this.name;
     }
@@ -42,5 +49,15 @@ public class Product {
 
     public void setBundle(boolean bundle) {
         isBundle = bundle;
+    }
+
+    public boolean isBundleOnly()
+    {
+        return this.bundleOnly;
+    }
+
+    public void makeBundleOnly(boolean bundleOnly)
+    {
+        this.bundleOnly = bundleOnly;
     }
 }
