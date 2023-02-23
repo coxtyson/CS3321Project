@@ -151,14 +151,14 @@ public class MariaDB implements Database {
     public TransactionRecord retrieveTransactionRecord(int transactionID) {
         String sql = "SELECT * FROM TABLE Transactions WHERE ID=(?)";
 
-
-        /*
-        try (PreparedStatement stmnt = connection.prepareStatement(sql)) {
-            stmnt.setInt(1, transactionID);
-            ResultSet results = stmnt.executeQuery();
+        try (var stmtnt = connection.prepareStatement(sql)) {
+            stmtnt.setInt(1, transactionID);
+            ResultSet results = stmtnt.executeQuery();
 
             if (results.first()) {
-
+                // TODO: need a constructor for this
+                //Transaction trans = new Transaction();
+                return  null;
             }
             else {
                 throw new Exception("No transaction with id " + transactionID);
@@ -166,10 +166,8 @@ public class MariaDB implements Database {
         }
         catch (Exception ex) {
             System.out.println(ex.toString());
+            return null;
         }
-        */
-
-        return null;
     }
 
     @Override
@@ -191,8 +189,36 @@ public class MariaDB implements Database {
 
     @Override
     public Product retrieveProduct(String name) {
-        String sql = "SELECT * FROM TABLE Products WHERE NAME=(?)";
-        return null;
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+
+        String sql = "SELECT * FROM Products WHERE Name=(?)";
+
+        try (var stmtnt = connection.prepareStatement(sql)) {
+            stmtnt.setString(1, name);
+            ResultSet results = stmtnt.executeQuery();
+
+            if (results.first()) {
+                int prodid = results.getInt(1);
+                String prodName = results.getString(2);
+                String prodSize = results.getString(3);
+                int prodQuant = results.getInt(4);
+                double prodPrice = results.getDouble(5);
+                boolean prodIsActive = results.getBoolean(6);
+                boolean prodBundleOnly = results.getBoolean(7);
+
+                Product prod = new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly);
+                return prod;
+            }
+            else {
+                throw new Exception("No product with the name " + name);
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+            return null;
+        }
     }
 
     @Override
