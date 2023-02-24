@@ -11,3 +11,15 @@
 #pageCustomer {
     -fx-padding: 50;
 }
+
+#grdProducts {
+    -fx-grid-lines-visible: true;
+}
+
+#scrllProducts {
+    -fx-fit-to-width: true;
+}
+
+#scrllCart {
+    -fx-fit-to-width: true;
+}

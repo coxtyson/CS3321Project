@@ -60,4 +60,9 @@ public class Price {
     public int getCents(){
         return this.cents;
     }
+
+    @Override
+    public String toString() {
+        return "$" + Integer.toString(dollars) + "." + Integer.toString(cents);
+    }
 }

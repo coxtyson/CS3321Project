@@ -8,21 +8,23 @@ public class Product {
     private boolean isBundle;
     private boolean bundleOnly;
     private String itemsInBundle;
+    private boolean isActive;
 
     /*Base constructor for products that are not bundles*/
-    public Product(String name, String size, int quantity, Price price, boolean bundleOnly){
+    public Product(String name, String size, int quantity, Price price, boolean bundleOnly, boolean isActive){
         this.name = name;
         this.size = size;
         this.quantity = quantity;
         this.price = price;
         this.bundleOnly = bundleOnly;
         this.isBundle = false;
+        this.isActive = isActive;
     }
 
     /*Product constructor for a product that does not have a size*/
-    public Product(String name, int quantity, Price price, boolean bundleOnly)
+    public Product(String name, int quantity, Price price, boolean bundleOnly, boolean isActive)
     {
-        this(name, null, quantity, price, bundleOnly);
+        this(name, null, quantity, price, bundleOnly, isActive);
     }
 
     /*Constructor for products that are bundles*/
@@ -66,5 +68,9 @@ public class Product {
     public void makeBundleOnly(boolean bundleOnly)
     {
         this.bundleOnly = bundleOnly;
+    }
+
+    public boolean isActive() {
+        return isActive;
     }
 }
