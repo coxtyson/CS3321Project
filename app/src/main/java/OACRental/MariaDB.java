@@ -16,7 +16,7 @@ public class MariaDB implements Database {
 
             String path = "jdbc:mysql://" + url + ":" + port + "/" + databaseName;
 
-            connection = DriverManager.getConnection(path,username, password);
+            connection = DriverManager.getConnection(path, username, password);
 
             if (!connection.isValid(timeoutSeconds)) {
                 throw new Exception("MariaDB connection failed");
@@ -208,8 +208,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                Product prod = new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly);
-                return prod;
+                return new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly);
             }
             else {
                 throw new Exception("No product with the name " + name);
@@ -248,6 +247,31 @@ public class MariaDB implements Database {
 
     @Override
     public List<Product> getAllProducts() {
-        return null;
+        String sql = "SELECT * FROM Products";
+
+        List<Product> prods = new ArrayList<>();
+
+        try (var stmnt = connection.prepareStatement(sql)) {
+            ResultSet results = stmnt.executeQuery();
+
+            while(results.next()) {
+                int prodid = results.getInt(1);
+                String prodName = results.getString(2);
+                String prodSize = results.getString(3);
+                int prodQuant = results.getInt(4);
+                double prodPrice = results.getDouble(5);
+                boolean prodIsActive = results.getBoolean(6);
+                boolean prodBundleOnly = results.getBoolean(7);
+
+                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly));
+            }
+        }
+        catch (Exception ex) {
+            System.out.println("Exception occurred while retrieving mariadb products:");
+            System.out.println(ex.toString());
+            return prods;
+        }
+
+        return prods;
     }
 }

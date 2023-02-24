@@ -102,12 +102,6 @@ public class UI extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("OAC Rental");
 
-        Scene scene = initUI();
-
-        scene.getStylesheets().add("style.css");
-
-        primaryStage.setScene(scene);
-
         SettingsManager.loadOrCreateSettings();
 
         try {
@@ -123,6 +117,12 @@ public class UI extends Application {
             System.out.println("Failed initial connection to database with reason:");
             System.out.println(ex.getMessage());
         }
+
+        Scene scene = initUI();
+
+        scene.getStylesheets().add("style.css");
+
+        primaryStage.setScene(scene);
 
         primaryStage.show();
     }

@@ -84,15 +84,12 @@ public class CustomerAddPage extends BorderPane {
 
         hbFoundCustomers = new HBox();
         hbFoundCustomers.setId("hbFoundCustomers");
-        hbFoundCustomers.getChildren().add(new Button("Guy with really long name\nID: 29272"));
 
         setRight(hbFoundCustomers);
         setMargin(hbFoundCustomers, new Insets(0, 0, 0, 20)); // TODO: move this to style.css
     }
 
     private void onType() {
-        // DataManager - lookup customers, generate button
-
         List<Customer> matches = DataManager.searchCustomers(
                 txtFirstName.getText(),
                 txtLastName.getText(),
@@ -105,6 +102,12 @@ public class CustomerAddPage extends BorderPane {
 
         for (Customer cust : matches) {
             Button btn = new Button(String.format("%s %s\n%s", cust.getFirstName(), cust.getLastName(), cust.getID()));
+
+            btn.setOnAction(event-> {
+                DataManager.setActiveCustomer(cust);
+                parent.nextPage();
+            });
+
             hbFoundCustomers.getChildren().add(btn);
         }
     }
