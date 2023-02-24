@@ -1,4 +1,5 @@
 package OACRental;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 /*
@@ -65,12 +66,24 @@ public class DataManager {
     }
 
     public static List<Product> getCart() {
+        if (cart == null) {
+            cart = new ArrayList<>();
+        }
+
         return cart;
     }
-    public static void setCart(Product product) {
+    public static void addProductToCart(Product product) {
+        if (cart == null) {
+            cart = new ArrayList<>();
+        }
+
         cart.add(product);
     }
     public static void clearActiveTransaction() {
+        if (cart == null) {
+            cart = new ArrayList<>();
+        }
+
         cart.clear();
     }
 

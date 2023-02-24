@@ -208,7 +208,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                return new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly);
+                return new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive);
             }
             else {
                 throw new Exception("No product with the name " + name);
@@ -263,7 +263,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly));
+                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive));
             }
         }
         catch (Exception ex) {
