@@ -35,6 +35,7 @@ public class UI extends Application {
         tasks = new ArrayList<>() {{
             add(new CheckoutTask());
             add(new SettingsTask());
+            add(new InventoryTask());
         }};
 
 
