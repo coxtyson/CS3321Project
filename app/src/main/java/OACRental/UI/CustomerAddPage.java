@@ -114,6 +114,7 @@ public class CustomerAddPage extends BorderPane {
 
     private void createCustomer() {
         // DataManager - create customer
+        DataManager.createCustomer(txtFirstName.getText(), txtLastName.getText(), txtID.getText(), txtPhone.getText(), txtEmail.getText());
         parent.nextPage();
     }
 }

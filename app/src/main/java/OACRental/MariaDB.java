@@ -222,6 +222,7 @@ public class MariaDB implements Database {
     @Override
     public Product retrieveProduct(String name, String size)
     {
+        /*
         if (name == null || name.isEmpty()) {
             return null;
         }
@@ -253,6 +254,8 @@ public class MariaDB implements Database {
             System.out.println(ex.toString());
             return null;
         }
+        */
+        return null;
     }
     @Override
     public List<Product> retrieveAllProductsWithName(String name)
@@ -264,6 +267,20 @@ public class MariaDB implements Database {
     @Override
     public void addCustomer(Customer customer) {
         String sql = "INSERT INTO Customers (FirstName, LastName, Identification, Phone, Email) VALUES (?, ?, ?, ?, ?)";
+
+        try(PreparedStatement stmnt = connection.prepareStatement(sql)) {
+            stmnt.setString(1, customer.getFirstName());
+            stmnt.setString(2, customer.getLastName());
+            stmnt.setString(3, customer.getID());
+            stmnt.setString(4, customer.getPhone());
+            stmnt.setString(5, customer.getEmail());
+            stmnt.executeQuery();
+
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
     }
 
     @Override
