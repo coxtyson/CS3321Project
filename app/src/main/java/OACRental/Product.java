@@ -66,4 +66,13 @@ public class Product {
     public boolean isActive() {
         return isActive;
     }
+
+    public String getPrettyName() {
+        if (size != null && !size.isEmpty()) {
+            return name + " - " + size;
+        }
+        else {
+            return name;
+        }
+    }
 }

@@ -60,7 +60,13 @@ public abstract class TaskView extends StackPane {
     public void jumpPage(int page) {
         if (page >= 0 && page <= pages.size() - 1) {
             getChildren().clear();
-            getChildren().add(pages.get(page));
+
+            Node pageObject = pages.get(page);
+            getChildren().add(pageObject);
+
+            if (pageObject instanceof Page) {
+                ((Page) pageObject).update();
+            }
         }
         else {
             throw new IllegalArgumentException("Illegal page number %d in CheckouTask".formatted(page));

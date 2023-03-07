@@ -2,31 +2,24 @@ package OACRental.UI;
 
 import OACRental.Customer;
 import OACRental.DataManager;
-import javafx.beans.Observable;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.control.IndexedCell;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 
-public class CustomerAddPage extends BorderPane {
+public class CustomerAddPage extends BorderPane implements Page {
     TextField txtFirstName;
     TextField txtLastName;
     TextField txtID;
     TextField txtPhone;
     TextField txtEmail;
 
-    HBox hbFoundCustomers;
+    HBox hboxFoundCustomers;
 
     TaskView parent;
 
@@ -82,11 +75,11 @@ public class CustomerAddPage extends BorderPane {
 
         setCenter(textBoxes);
 
-        hbFoundCustomers = new HBox();
-        hbFoundCustomers.setId("hbFoundCustomers");
+        hboxFoundCustomers = new HBox();
+        hboxFoundCustomers.setId("hboxFoundCustomers");
 
-        setRight(hbFoundCustomers);
-        setMargin(hbFoundCustomers, new Insets(0, 0, 0, 20)); // TODO: move this to style.css
+        setRight(hboxFoundCustomers);
+        setMargin(hboxFoundCustomers, new Insets(0, 0, 0, 20)); // TODO: move this to style.css
     }
 
     private void onType() {
@@ -98,7 +91,7 @@ public class CustomerAddPage extends BorderPane {
                 txtEmail.getText()
         );
 
-        hbFoundCustomers.getChildren().clear();
+        hboxFoundCustomers.getChildren().clear();
 
         for (Customer cust : matches) {
             Button btn = new Button(String.format("%s %s\n%s", cust.getFirstName(), cust.getLastName(), cust.getID()));
@@ -108,12 +101,17 @@ public class CustomerAddPage extends BorderPane {
                 parent.nextPage();
             });
 
-            hbFoundCustomers.getChildren().add(btn);
+            hboxFoundCustomers.getChildren().add(btn);
         }
     }
 
     private void createCustomer() {
         // DataManager - create customer
         parent.nextPage();
+    }
+
+    @Override
+    public void update() {
+        // TODO: maybe leave this blank, but perhaps pull active customer here and update textboxes?
     }
 }

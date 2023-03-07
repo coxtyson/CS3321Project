@@ -4,15 +4,12 @@ import OACRental.DataManager;
 import OACRental.Product;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
-import org.checkerframework.checker.units.qual.C;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 
-public class ItemRentPage extends GridPane {
+public class ItemRentPage extends GridPane implements Page {
     List<Product> productList;
 
     ScrollPane scrllProducts;
@@ -59,6 +56,15 @@ public class ItemRentPage extends GridPane {
         Label lblCartHeader = new Label("Cart");
         Button btnCartCheckout = new Button("Checkout");
 
+        btnCartCheckout.setOnAction(event -> {
+            parent.nextPage();
+        });
+
+        scrllProducts.setContent(grdProducts);
+
+        scrllProducts.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrllProducts.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+
         scrllCart.setContent(vboxCart);
         grdCart.add(lblCartHeader, 0, 0);
         grdCart.add(scrllCart, 0, 1);
@@ -80,7 +86,7 @@ public class ItemRentPage extends GridPane {
         );
 
 
-        updateCart();
+        // Generate the product grid labels and buttons from database data
 
         productList = DataManager.getAllProducts();
 
@@ -133,11 +139,8 @@ public class ItemRentPage extends GridPane {
         setMargin(scrllCart, new Insets(20));
 
 
-        scrllProducts.setContent(grdProducts);
 
-        scrllProducts.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrllProducts.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-
+        // Insert the child panels into this one
 
         add(scrllProducts, 0, 0);
         add(grdCart, 1, 0);
@@ -160,5 +163,10 @@ public class ItemRentPage extends GridPane {
 
             vboxCart.getChildren().add(lblProduct);
         }
+    }
+
+    @Override
+    public void update() {
+        updateCart();
     }
 }
