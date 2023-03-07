@@ -28,7 +28,14 @@ public class Product {
     }
 
     /*Constructor for products that are bundles*/
-    public Product(String name, String items, Price price, boolean isBundle){}
+    public Product(String name, String items, Price price, boolean isBundle)
+    {
+        this.name = name;
+        this.price = price;
+        this.isBundle = true;
+        this.itemsInBundle = items;
+    }
+
     public String getName(){
         return this.name;
     }

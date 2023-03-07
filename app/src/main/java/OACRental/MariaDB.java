@@ -219,10 +219,68 @@ public class MariaDB implements Database {
             return null;
         }
     }
+    @Override
+    public Product retrieveProduct(String name, String size)
+    {
+        /*
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+
+        String sql = "SELECT * FROM Products WHERE Name=(?) AND Size=(?)";
+
+        try (var stmtnt = connection.prepareStatement(sql)) {
+            stmtnt.setString(1, name);
+            stmtnt.setString(2, size);
+            ResultSet results = stmtnt.executeQuery();
+
+            if (results.first()) {
+                int prodid = results.getInt(1);
+                String prodName = results.getString(2);
+                String prodSize = results.getString(3);
+                int prodQuant = results.getInt(4);
+                double prodPrice = results.getDouble(5);
+                boolean prodIsActive = results.getBoolean(6);
+                boolean prodBundleOnly = results.getBoolean(7);
+
+                Product prod = new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly);
+                return prod;
+            }
+            else {
+                throw new Exception("No product with the name " + name + "and size " + size);
+            }
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+            return null;
+        }
+        */
+        return null;
+    }
+    @Override
+    public List<Product> retrieveAllProductsWithName(String name)
+    {
+        //TODO add sql query that returns all products with given name
+        return null;
+    }
 
     @Override
     public void addCustomer(Customer customer) {
         String sql = "INSERT INTO Customers (FirstName, LastName, Identification, Phone, Email) VALUES (?, ?, ?, ?, ?)";
+
+        try(PreparedStatement stmnt = connection.prepareStatement(sql)) {
+            stmnt.setString(1, customer.getFirstName());
+            stmnt.setString(2, customer.getLastName());
+            stmnt.setString(3, customer.getID());
+            stmnt.setString(4, customer.getPhone());
+            stmnt.setString(5, customer.getEmail());
+            stmnt.executeQuery();
+
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
+
     }
 
     @Override

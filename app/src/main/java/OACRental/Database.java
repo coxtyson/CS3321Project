@@ -16,6 +16,8 @@ public interface Database {
         public List<TransactionRecord> retrieveTransactionRecords(Date startDate, Date endDate);
 
         public Product retrieveProduct(String name);
+        public Product retrieveProduct(String name, String size);
+        public List<Product> retrieveAllProductsWithName(String name);
         public List<Product> bundleToComponents(String name);
         public List<Product> bundleToComponents(Product product);
         public List<Product> getAllProducts();

@@ -2,6 +2,7 @@ package OACRental;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
+import java.util.ArrayList;
 /*
 * Customer
 *   1. Search for a customer
@@ -128,4 +129,20 @@ public class DataManager {
         return database.retrieveTransactionRecords(startDate, endDate);
     }
 
+    public static List<Product> searchInventory(String name, String size)
+    {
+        ArrayList<Product> products = new ArrayList<Product>();
+        if(size == null)
+        {
+            for(Product prod : database.retrieveAllProductsWithName(name)){
+                products.add(prod);
+            }
+            return products;
+        }
+        else{
+            products.add(database.retrieveProduct(name, size));
+            return products;
+        }
+
+    }
 }
