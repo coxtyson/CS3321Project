@@ -6,7 +6,6 @@ import OACRental.Receipt;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 
 public class CheckoutPage extends GridPane implements Page {

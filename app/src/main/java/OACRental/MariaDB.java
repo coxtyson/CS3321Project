@@ -1,5 +1,6 @@
 package OACRental;
 
+import java.io.IOException;
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -258,10 +259,37 @@ public class MariaDB implements Database {
         return null;
     }
     @Override
-    public List<Product> retrieveAllProductsWithName(String name)
-    {
-        //TODO add sql query that returns all products with given name
-        return null;
+    public List<Product> retrieveAllProductsWithName(String name) {
+        if (name == null) {
+            return new ArrayList<>();
+        }
+
+        String sql = "SELECT * FROM Products WHERE NAME = (?)";
+
+        try(PreparedStatement stmnt = connection.prepareStatement(sql)) {
+            stmnt.setString(1, name);
+            ResultSet results = stmnt.executeQuery();
+
+            ArrayList<Product> prods = new ArrayList<>();
+
+            while(results.next()) {
+                int prodid = results.getInt(1);
+                String prodName = results.getString(2);
+                String prodSize = results.getString(3);
+                int prodQuant = results.getInt(4);
+                double prodPrice = results.getDouble(5);
+                boolean prodIsActive = results.getBoolean(6);
+                boolean prodBundleOnly = results.getBoolean(7);
+
+                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive));
+            }
+
+            return prods;
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -274,8 +302,7 @@ public class MariaDB implements Database {
             stmnt.setString(3, customer.getID());
             stmnt.setString(4, customer.getPhone());
             stmnt.setString(5, customer.getEmail());
-            stmnt.executeQuery();
-
+            stmnt.execute();
         }
         catch (Exception ex) {
             System.out.println(ex.toString());

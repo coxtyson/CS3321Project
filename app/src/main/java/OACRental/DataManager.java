@@ -129,20 +129,14 @@ public class DataManager {
         return database.retrieveTransactionRecords(startDate, endDate);
     }
 
-    public static List<Product> searchInventory(String name, String size)
-    {
-        ArrayList<Product> products = new ArrayList<Product>();
-        if(size == null)
-        {
-            for(Product prod : database.retrieveAllProductsWithName(name)){
-                products.add(prod);
-            }
-            return products;
+    public static List<Product> searchInventory(String name, String size) {
+        if(size == null || size.isEmpty()) {
+            return database.retrieveAllProductsWithName(name);
         }
         else{
+            ArrayList<Product> products = new ArrayList<Product>();
             products.add(database.retrieveProduct(name, size));
             return products;
         }
-
     }
 }

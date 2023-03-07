@@ -24,8 +24,7 @@ public class InventoryViewerPage extends BorderPane{
     TaskView parent;
     GridPane productGrid;
 
-    public InventoryViewerPage(TaskView parent)
-    {
+    public InventoryViewerPage(TaskView parent) {
         setId("pageInventory");
         this.parent = parent;
         this.productGrid = new GridPane();
@@ -45,6 +44,9 @@ public class InventoryViewerPage extends BorderPane{
         txtProductSize.setId("txtProductSize");
         txtProductName.setId("txtProductName");
 
+        txtProductName.textProperty().addListener((observable -> this.onType()));
+        txtProductSize.textProperty().addListener((observable -> this.onType()));
+
         VBox vProductName = new VBox(lblProductName, txtProductName);
         VBox vProductSize = new VBox(lblProductSize, txtProductSize);
 
@@ -55,7 +57,6 @@ public class InventoryViewerPage extends BorderPane{
 
         Button btnSearch = new Button("Search Inventory");
         btnSearch.setOnAction(event -> this.search());
-
 
 
         productGrid.setGridLinesVisible(true);
@@ -69,20 +70,30 @@ public class InventoryViewerPage extends BorderPane{
 
         productGrid.autosize();
 
+        setBottom(productGrid);
+    }
+
+    private void onType() {
+        search();
     }
 
     private void search() {
         //lookup product in inventory, generate grid with results
+        productGrid.getChildren().clear();
 
         List<Product> matches = DataManager.searchInventory(
                 txtProductName.getText(),
                 txtProductSize.getText()
         );
 
+        int rowindex = 0;
         for(Product prod : matches)
         {
+
             //TODO add loop that adds a new row to the grid of products in inventory, adds the product to the row, and displays it to the user
-            productGrid.addRow(productGrid.getRowCount() + 1);
+            //productGrid.addRow(productGrid.getRowCount() + 1);
+            productGrid.add(new Label(prod.getPrettyName()), 0, rowindex);
+            rowindex++;
         }
     }
 
