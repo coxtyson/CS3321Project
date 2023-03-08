@@ -91,7 +91,7 @@ public class Customer {
             return false;
         }
 
-        if (email != null && !phone.equals(compareTo.email)) {
+        if (email != null && !email.equals(compareTo.email)) {
             return false;
         }
 

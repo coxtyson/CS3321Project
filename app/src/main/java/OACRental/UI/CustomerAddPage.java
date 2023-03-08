@@ -5,21 +5,20 @@ import OACRental.DataManager;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 import java.util.List;
 
-public class CustomerAddPage extends BorderPane implements Page {
+public class CustomerAddPage extends GridPane implements Page {
     TextField txtFirstName;
     TextField txtLastName;
     TextField txtID;
     TextField txtPhone;
     TextField txtEmail;
 
-    HBox hboxFoundCustomers;
+    VBox vFoundCustomers;
 
     TaskView parent;
 
@@ -73,13 +72,23 @@ public class CustomerAddPage extends BorderPane implements Page {
 
         textBoxes.setMaxWidth(1000);
 
-        setCenter(textBoxes);
+        ColumnConstraints leftCol = new ColumnConstraints();
+        ColumnConstraints rightCol = new ColumnConstraints();
 
-        hboxFoundCustomers = new HBox();
-        hboxFoundCustomers.setId("hboxFoundCustomers");
+        leftCol.setPercentWidth(80);
+        rightCol.setPercentWidth(20);
 
-        setRight(hboxFoundCustomers);
-        setMargin(hboxFoundCustomers, new Insets(0, 0, 0, 20)); // TODO: move this to style.css
+        getColumnConstraints().addAll(leftCol, rightCol);
+
+        add(textBoxes, 0, 0);
+
+        vFoundCustomers = new VBox();
+        vFoundCustomers.setId("hboxFoundCustomers");
+
+        ScrollPane scrllFoundCustomers = new ScrollPane(vFoundCustomers);
+
+        add(scrllFoundCustomers, 1, 0);
+        setMargin(scrllFoundCustomers, new Insets(0, 0, 0, 20)); // TODO: move this to style.css
     }
 
     private void onType() {
@@ -88,10 +97,12 @@ public class CustomerAddPage extends BorderPane implements Page {
                 txtLastName.getText(),
                 txtID.getText(),
                 txtPhone.getText(),
-                txtEmail.getText()
+                txtEmail.getText(),
+                true
         );
 
-        hboxFoundCustomers.getChildren().clear();
+        vFoundCustomers.getChildren().clear();
+
 
         for (Customer cust : matches) {
             Button btn = new Button(String.format("%s %s\n%s", cust.getFirstName(), cust.getLastName(), cust.getID()));
@@ -101,12 +112,11 @@ public class CustomerAddPage extends BorderPane implements Page {
                 parent.nextPage();
             });
 
-            hboxFoundCustomers.getChildren().add(btn);
+            vFoundCustomers.getChildren().add(btn);
         }
     }
 
     private void createCustomer() {
-        // DataManager - create customer
         DataManager.createCustomer(txtFirstName.getText(), txtLastName.getText(), txtID.getText(), txtPhone.getText(), txtEmail.getText());
         parent.nextPage();
     }

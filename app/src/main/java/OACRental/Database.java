@@ -9,7 +9,7 @@ public interface Database {
 
         public Customer retrieveCustomer(Customer customer);
         public Customer retrieveCustomer(String firstName, String lastName, String phone, String ID, String email);
-        public List<Customer> retrieveCustomers(String firstName, String lastName, String phone, String ID, String email);
+        public List<Customer> retrieveCustomers(String firstName, String lastName, String phone, String ID, String email, boolean fuzzy);
         public TransactionRecord retrieveTransactionRecord(int transactionID);
         public List<TransactionRecord> retrieveTransactionRecords(Customer customer);
         public List<TransactionRecord> retrieveTransactionRecords(Customer customer, Date startDate, Date endDate);

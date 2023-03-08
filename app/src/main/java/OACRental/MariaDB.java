@@ -94,57 +94,136 @@ public class MariaDB implements Database {
      * @param phone Nullable - the customer's phone number
      * @param ID Nullable - the customer's bengal id/driver's license
      * @param email Nullable - the customer's email
+     * @param fuzzy If false, find only customers with exact matching data, otherwise any customer that fuzzy-matches
      * @return a list of customer's matching all criterion
      */
     @Override
-    public List<Customer> retrieveCustomers(String firstName, String lastName, String phone, String ID, String email) {
+    public List<Customer> retrieveCustomers(String firstName, String lastName, String phone, String ID, String email, boolean fuzzy) {
         List<Customer> custs = new ArrayList<>();
 
-        if (firstName != null && !firstName.isEmpty()) {
-            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE FirstName LIKE (?)")) {
-                stmt.setString(1, firstName);
-                stmt.execute();
-                appendCustomersFromResults(custs, stmt.getResultSet());
-            } catch (Exception ex) {
-                System.out.println(ex.toString());
+        int conditions = 0;
+        boolean[] conditionStatuses = {false, false, false, false, false};
+        StringBuilder builder = new StringBuilder("SELECT * FROM Customers WHERE ");
+
+        if (firstName != null && !firstName.trim().isEmpty()) {
+            builder.append("FirstName LIKE (?)");
+            conditions++;
+            conditionStatuses[0] = true;
+        }
+
+        if (lastName != null && !lastName.trim().isEmpty()) {
+            if (conditions > 0) {
+                builder.append(" AND ");
             }
+
+            builder.append("LastName Like (?)");
+            conditions++;
+            conditionStatuses[1] = true;
         }
 
-        if (lastName != null && ! lastName.isEmpty()) {
-            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE LastName LIKE (?)")) {
-                stmt.setString(1, lastName);
-                stmt.execute();
-                appendCustomersFromResults(custs, stmt.getResultSet());
-            } catch (Exception ignored) {}
-        }
-
-        if (phone != null && !phone.isEmpty()) {
-            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE Phone LIKE (?)")) {
-                stmt.setString(1, phone);
-                stmt.execute();
-                appendCustomersFromResults(custs, stmt.getResultSet());
-            } catch (Exception ignored) {}
-        }
-
-        if (ID != null && !ID.isEmpty()) {
-            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE Identification LIKE (?)")) {
-                stmt.setString(1, ID);
-                stmt.execute();
-                appendCustomersFromResults(custs, stmt.getResultSet());
+        if (phone != null && !phone.trim().isEmpty()) {
+            if (conditions > 0) {
+                builder.append(" AND ");
             }
-            catch (Exception ignored) {}
+
+            builder.append("Phone Like (?)");
+            conditions++;
+            conditionStatuses[2] = true;
         }
 
-        if (email != null && !email.isEmpty()) {
-            try (var stmt = connection.prepareStatement("SELECT * FROM Customers WHERE Email LIKE (?)")) {
-                stmt.setString(1, email);
-                stmt.execute();
-                appendCustomersFromResults(custs, stmt.getResultSet());
+        if (ID != null && !ID.trim().isEmpty()) {
+            if (conditions > 0) {
+                builder.append(" AND ");
             }
-            catch (Exception ignored) {}
+
+            builder.append("Identification Like (?)");
+            conditions++;
+            conditionStatuses[3] = true;
         }
 
-        return custs;
+        if (email != null && !email.trim().isEmpty()) {
+            if (conditions > 0) {
+                builder.append(" AND ");
+            }
+
+            builder.append("Identification Like (?)");
+            conditions++;
+            conditionStatuses[4] = true;
+        }
+
+        String sql = builder.toString();
+        int conditionIndex = 0;
+        try (var stmt = connection.prepareStatement(sql)) {
+            for(int i = 0; i < conditions; i++) {
+                while(!conditionStatuses[conditionIndex] && conditionIndex < conditionStatuses.length - 1) {
+                    conditionIndex++;
+                }
+
+                switch (conditionIndex) {
+                    case 0:
+                        if (fuzzy) {
+                            stmt.setString(i + 1, "%" + firstName + "%");
+                        }
+                        else {
+                            stmt.setString(i + 1, firstName);
+                        }
+                        break;
+                    case 1:
+                        if (fuzzy) {
+                            stmt.setString(i + 1, "%" + lastName + "%");
+                        }
+                        else {
+                            stmt.setString(i + 1, lastName);
+                        }
+                        break;
+                    case 2:
+                        if (fuzzy) {
+                            stmt.setString(i + 1, "%" + phone + "%");
+                        }
+                        else {
+                            stmt.setString(i + 1, phone);
+                        }
+                        break;
+                    case 3:
+                        if (fuzzy) {
+                            stmt.setString(i + 1, "%" + ID + "%");
+                        }
+                        else {
+                            stmt.setString(i + 1, ID);
+                        }
+                        break;
+                    case 4:
+                        if (fuzzy) {
+                            stmt.setString(i + 1, "%" + email + "%");
+                        }
+                        else {
+                            stmt.setString(i + 1, email);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            ResultSet results = stmt.executeQuery();
+
+            while (results.next()) {
+                int custid = results.getInt("ID");
+                String first = results.getString("FirstName");
+                String last = results.getString("LastName");
+                String id = results.getString("Identification");
+                String phoneres = results.getString("Phone");
+                String emailres = results.getString("Email");
+
+                custs.add(new Customer(custid, first, last, id, phoneres, emailres));
+            }
+
+            return custs;
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+            return new ArrayList<>();
+        }
     }
 
 
@@ -302,12 +381,11 @@ public class MariaDB implements Database {
             stmnt.setString(3, customer.getID());
             stmnt.setString(4, customer.getPhone());
             stmnt.setString(5, customer.getEmail());
-            stmnt.execute();
+            stmnt.executeUpdate();
         }
         catch (Exception ex) {
             System.out.println(ex.toString());
         }
-
     }
 
     @Override

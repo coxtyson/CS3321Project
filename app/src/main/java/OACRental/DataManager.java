@@ -88,8 +88,8 @@ public class DataManager {
         cart.clear();
     }
 
-    public static List<Customer> searchCustomers(String first, String last, String phone, String id, String email) {
-        return database.retrieveCustomers(first, last, phone, id, email);
+    public static List<Customer> searchCustomers(String first, String last, String phone, String id, String email, boolean fuzzy) {
+        return database.retrieveCustomers(first, last, phone, id, email, fuzzy);
     }
 
     public static void createCustomer(String first, String last, String ID, String phone, String email) {
