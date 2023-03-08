@@ -17,8 +17,10 @@ public class Product {
         this.quantity = quantity;
         this.price = price;
         this.bundleOnly = bundleOnly;
-        this.isBundle = false;
         this.isActive = isActive;
+
+        this.isBundle = false;
+        this.itemsInBundle = null;
     }
 
     /*Product constructor for a product that does not have a size*/
@@ -33,6 +35,7 @@ public class Product {
         this.name = name;
         this.price = price;
         this.isBundle = true;
+        this.bundleOnly = false;
         this.itemsInBundle = items;
     }
 
@@ -81,5 +84,10 @@ public class Product {
         else {
             return name;
         }
+    }
+
+    public String getItems()
+    {
+        return this.itemsInBundle;
     }
 }
