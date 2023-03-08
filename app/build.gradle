@@ -44,4 +44,6 @@ javafx {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    maxHeapSize = '1G'
+    failFast = true
 }
