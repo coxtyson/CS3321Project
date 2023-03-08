@@ -61,32 +61,6 @@ public class MariaDB implements Database {
         return null;
     }
 
-
-    private void appendCustomersFromResults(List<Customer> list, ResultSet results) throws SQLException {
-        while (results.next()) {
-            int custid = results.getInt("ID");
-            String first = results.getString("FirstName");
-            String last = results.getString("LastName");
-            String id = results.getString("Identification");
-            String phone = results.getString("Phone");
-            String email = results.getString("Email");
-
-            Customer cm = new Customer(custid, first, last, id, phone, email);
-
-            boolean present = false;
-            for (Customer cust : list) {
-                if (cm.equals(cust)) {
-                    present = true;
-                    break;
-                }
-            }
-
-            if (!present) {
-                list.add(cm);
-            }
-        }
-    }
-
     /**
      * Search the database for a list of customers matching some criterion
      * @param firstName Nullable - the customer's first name
@@ -100,108 +74,62 @@ public class MariaDB implements Database {
     @Override
     public List<Customer> retrieveCustomers(String firstName, String lastName, String phone, String ID, String email, boolean fuzzy) {
         List<Customer> custs = new ArrayList<>();
-
-        int conditions = 0;
-        boolean[] conditionStatuses = {false, false, false, false, false};
+        List<String> parameters = new ArrayList<>();
         StringBuilder builder = new StringBuilder("SELECT * FROM Customers WHERE ");
 
         if (firstName != null && !firstName.trim().isEmpty()) {
             builder.append("FirstName LIKE (?)");
-            conditions++;
-            conditionStatuses[0] = true;
+            parameters.add(firstName.trim());
         }
 
         if (lastName != null && !lastName.trim().isEmpty()) {
-            if (conditions > 0) {
+            if (!parameters.isEmpty()) {
                 builder.append(" AND ");
             }
 
-            builder.append("LastName Like (?)");
-            conditions++;
-            conditionStatuses[1] = true;
+            builder.append("LastName LIKE (?)");
+            parameters.add(lastName.trim());
         }
 
         if (phone != null && !phone.trim().isEmpty()) {
-            if (conditions > 0) {
+            if (!parameters.isEmpty()) {
                 builder.append(" AND ");
             }
 
-            builder.append("Phone Like (?)");
-            conditions++;
-            conditionStatuses[2] = true;
+            builder.append("Phone LIKE (?)");
+            parameters.add(phone.trim());
         }
 
         if (ID != null && !ID.trim().isEmpty()) {
-            if (conditions > 0) {
+            if (!parameters.isEmpty()) {
                 builder.append(" AND ");
             }
 
-            builder.append("Identification Like (?)");
-            conditions++;
-            conditionStatuses[3] = true;
+            builder.append("Identification LIKE (?)");
+            parameters.add(ID.trim());
         }
 
         if (email != null && !email.trim().isEmpty()) {
-            if (conditions > 0) {
+            if (!parameters.isEmpty()) {
                 builder.append(" AND ");
             }
 
-            builder.append("Identification Like (?)");
-            conditions++;
-            conditionStatuses[4] = true;
+            builder.append("Email LIKE (?)");
+            parameters.add(email.trim());
+        }
+
+        if (parameters.isEmpty()) {
+            return new ArrayList<>();
         }
 
         String sql = builder.toString();
-        int conditionIndex = 0;
         try (var stmt = connection.prepareStatement(sql)) {
-            for(int i = 0; i < conditions; i++) {
-                while(!conditionStatuses[conditionIndex] && conditionIndex < conditionStatuses.length - 1) {
-                    conditionIndex++;
+            for (int i = 0; i < parameters.size(); i++) {
+                if (fuzzy) {
+                    stmt.setString(i + 1, "%" + parameters.get(i) + "%");
                 }
-
-                switch (conditionIndex) {
-                    case 0:
-                        if (fuzzy) {
-                            stmt.setString(i + 1, "%" + firstName + "%");
-                        }
-                        else {
-                            stmt.setString(i + 1, firstName);
-                        }
-                        break;
-                    case 1:
-                        if (fuzzy) {
-                            stmt.setString(i + 1, "%" + lastName + "%");
-                        }
-                        else {
-                            stmt.setString(i + 1, lastName);
-                        }
-                        break;
-                    case 2:
-                        if (fuzzy) {
-                            stmt.setString(i + 1, "%" + phone + "%");
-                        }
-                        else {
-                            stmt.setString(i + 1, phone);
-                        }
-                        break;
-                    case 3:
-                        if (fuzzy) {
-                            stmt.setString(i + 1, "%" + ID + "%");
-                        }
-                        else {
-                            stmt.setString(i + 1, ID);
-                        }
-                        break;
-                    case 4:
-                        if (fuzzy) {
-                            stmt.setString(i + 1, "%" + email + "%");
-                        }
-                        else {
-                            stmt.setString(i + 1, email);
-                        }
-                        break;
-                    default:
-                        break;
+                else {
+                    stmt.setString(i + 1, parameters.get(i));
                 }
             }
 

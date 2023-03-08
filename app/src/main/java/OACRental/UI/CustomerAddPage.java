@@ -95,8 +95,8 @@ public class CustomerAddPage extends GridPane implements Page {
         List<Customer> matches = DataManager.searchCustomers(
                 txtFirstName.getText(),
                 txtLastName.getText(),
-                txtID.getText(),
                 txtPhone.getText(),
+                txtID.getText(),
                 txtEmail.getText(),
                 true
         );
