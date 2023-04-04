@@ -69,16 +69,15 @@ public class Price {
     }
 
     /*Method to handle adding two prices together (updates calling price to be itself + the added price)*/
-    public void add(Price other)
-    {
+    public void add(Price other) {
         this.cents += other.getCents();
 
         //ensure that the total cents is not 100 or more
-        if(this.cents >= 100)
-        {
+        while (this.cents >= 100) {
             this.dollars++;
             this.cents -= 100;
         }
+
         this.dollars += other.getDollars();
     }
 
@@ -87,13 +86,6 @@ public class Price {
     {
 
 
-    }
-
-    /*Returns a string of the price object $000.00*/
-    private String getPriceString()
-    {
-            String priceStr = String.format("%d.%d", this.dollars, this.cents);
-            return priceStr;
     }
 
     /*Method to round cents if there are more than 2 digits worth of cents*/

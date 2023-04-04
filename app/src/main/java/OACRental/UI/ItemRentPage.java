@@ -1,6 +1,7 @@
 package OACRental.UI;
 
 import OACRental.DataManager;
+import OACRental.Price;
 import OACRental.Product;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -14,6 +15,8 @@ public class ItemRentPage extends GridPane implements Page {
 
     ScrollPane scrllProducts;
     ScrollPane scrllCart;
+
+    Label lblTotal;
 
     GridPane grdCart;
     GridPane grdProducts;
@@ -42,7 +45,7 @@ public class ItemRentPage extends GridPane implements Page {
         // Create the panels and their child controls
 
         grdProducts = new GridPane();
-        grdProducts.setId("grdProducts");
+        grdProducts.setId("grdCheckoutProducts");
 
         grdCart = new GridPane();
         grdCart.setId("grdCart");
@@ -54,6 +57,7 @@ public class ItemRentPage extends GridPane implements Page {
         scrllCart.setId("scrllCart");
 
         Label lblCartHeader = new Label("Cart");
+        lblTotal = new Label("Total: $0.00");
         Button btnCartCheckout = new Button("Checkout");
 
         btnCartCheckout.setOnAction(event -> {
@@ -68,9 +72,11 @@ public class ItemRentPage extends GridPane implements Page {
         scrllCart.setContent(vboxCart);
         grdCart.add(lblCartHeader, 0, 0);
         grdCart.add(scrllCart, 0, 1);
-        grdCart.add(btnCartCheckout, 0, 2);
+        grdCart.add(lblTotal, 0, 2);
+        grdCart.add(btnCartCheckout, 0, 3);
 
         GridPane.setHalignment(lblCartHeader, HPos.CENTER);
+        GridPane.setHalignment(lblTotal, HPos.CENTER);
         GridPane.setHalignment(btnCartCheckout, HPos.CENTER);
 
         ColumnConstraints cartCol = new ColumnConstraints();
@@ -151,6 +157,8 @@ public class ItemRentPage extends GridPane implements Page {
 
         List<Product> cart = DataManager.getCart();
 
+        Price total = new Price();
+
         for (Product prod : cart) {
             Label lblProduct = new Label();
 
@@ -161,8 +169,12 @@ public class ItemRentPage extends GridPane implements Page {
                 lblProduct.setText(prod.getName() + "\n" + prod.getPrice());
             }
 
+            total.add(prod.getPrice());
+
             vboxCart.getChildren().add(lblProduct);
         }
+
+        lblTotal.setText("Total: " + total);
     }
 
     @Override
