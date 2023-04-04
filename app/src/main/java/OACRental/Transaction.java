@@ -5,24 +5,22 @@ import java.util.Calendar;
 public class Transaction {
     private Customer customer;
     private int discountPercentage;
-    private List<Bundle> bundles;
-    private List<LineItem> lineItems;
+    private List<Product> products;
     private Date checkout;
     private Date expectedReturn;
 
-    public Transaction(Customer customer, List<Bundle> bundles, List<LineItem> lineItems, Date checkout,
+    public Transaction(Customer customer,List<Product> products, Date checkout,
                        Date expectedReturn, int discountPercentage)
     {
         this.customer = customer;
-        this.bundles = bundles;
-        this.lineItems = lineItems;
+        this.products = products;
         this.checkout = checkout;
         this.expectedReturn = expectedReturn;
         this.discountPercentage = discountPercentage;
     }
 
-    public Transaction(Customer customer, List<Bundle> bundles, List<LineItem> lineItems, Date checkout, Date expectedReturn){
-        this(customer, bundles, lineItems, checkout, expectedReturn, 0);
+    public Transaction(Customer customer, List<Product> products, Date checkout, Date expectedReturn){
+        this(customer, products, checkout, expectedReturn, 0);
     }
 
     public Customer getCustomer(){
@@ -37,10 +35,23 @@ public class Transaction {
     public Date getExpectedReturn(){
         return this.expectedReturn;
     }
-    public List<Bundle> getBundles(){
-        return this.bundles;
+    public List<Product> getProducts(){
+        return this.products;
     }
-    public List<LineItem> getLineItems(){
-        return this.lineItems;
+
+    public Price getTotalPrice()
+    {
+        Price totalPrice = new Price(); //$00.00
+        //add the prices for every item in the cart
+        for(Product p : this.products)
+        {
+            totalPrice.add(p.getPrice());
+        }
+        if(this.discountPercentage > 0)
+        {
+            //convert percent to decimal value
+            double discountDecimal = this.discountPercentage / 100;
+            totalPrice.multiply((1-discountDecimal));
+        }
     }
 }

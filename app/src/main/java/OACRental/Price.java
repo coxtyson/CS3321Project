@@ -38,6 +38,20 @@ public class Price {
 
     public Price(int dollars, int cents) {
         this.dollars = dollars;
+
+        //ensure that if the price is created using 2 integers, the cents integer will not be greater than 99
+        if(cents > 99) {
+            while (cents > 99) {
+                this.dollars++;
+                cents -= 100;
+            }
+        }
+        //ensure that if the price is created using a single digit int, that it is represented properly (i.e. 1 cent -> 01)
+        if(cents < 10 && cents > 0)
+        {
+            String centStr = String.format("%02d", cents);
+
+        }
         this.cents = cents;
     }
 
@@ -52,6 +66,40 @@ public class Price {
         int c = this.cents;
         String temp = d + "." + String.format("%02d" , c);
         return Double.parseDouble(temp);
+    }
+
+    /*Method to handle adding two prices together (updates calling price to be itself + the added price)*/
+    public void add(Price other)
+    {
+        this.cents += other.getCents();
+
+        //ensure that the total cents is not 100 or more
+        if(this.cents >= 100)
+        {
+            this.dollars++;
+            this.cents -= 100;
+        }
+        this.dollars += other.getDollars();
+    }
+
+    /*Multiplies the Price by a given value*/
+    public void multiply(double multiplyBy)
+    {
+
+
+    }
+
+    /*Returns a string of the price object $000.00*/
+    private String getPriceString()
+    {
+            String priceStr = String.format("%d.%d", this.dollars, this.cents);
+            return priceStr;
+    }
+
+    /*Method to round cents if there are more than 2 digits worth of cents*/
+    private void roundCents()
+    {
+
     }
 
     public int getDollars(){

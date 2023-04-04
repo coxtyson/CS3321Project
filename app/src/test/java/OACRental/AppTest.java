@@ -6,6 +6,9 @@ package OACRental;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 public class AppTest {
     
     /*Test local Customer creation and basic accessor methods*/
@@ -33,6 +36,16 @@ public class AppTest {
         assertEquals(testPrice.getCents(), 11, 0, "Cents must be accessible");
         assertEquals(testPrice.getDollars(), 11, 0, "Dollars must be accessible");
         assertEquals(testPrice.getTotal(), 11.11, 0.0, "Price must be accessible as a double");
+
+        Price testAddZero = new Price();
+        assertNotNull(testAddZero);
+        assertEquals(testAddZero.getTotal(), 0.0, 0.0);
+
+        Price testAddOne = new Price(1,1);
+
+
+
+
     }
 
     /*Tests Product creation and accessor methods*/
@@ -69,4 +82,28 @@ public class AppTest {
         assertEquals("Item1,Item2,Item3", testProduct3.getItems(), "Product 3 should have bundle items since it is a bundle");
 
     }
+
+    /*Tests Transaction creation and accessors*/
+    @Test
+    public void testTransaction()
+    {
+        Price price = new Price(11.11);
+        Customer testCustomer = new Customer("Test", "Customer", "00000", "123-456-7890", "Test@Test.com");
+        Product testProduct1 = new Product("Test","Small", 10, price, false, false);
+        Product testProduct2 = new Product("Test2", 5, price, true, false);
+        Product testProduct3 = new Product("TestBundle", "Item1,Item2,Item3", price, true);
+
+        ArrayList<Product> testProducts = new ArrayList<Product>();
+        testProducts.add(testProduct1);
+        testProducts.add(testProduct2);
+        testProducts.add(testProduct3);
+
+        Date checkoutDate = new Date();
+        Date returnDate = new Date();
+
+        Transaction testTransaction = new Transaction(testCustomer, testProducts, checkoutDate, returnDate);
+
+    }
+
+
 }
