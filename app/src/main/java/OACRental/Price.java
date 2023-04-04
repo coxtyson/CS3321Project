@@ -26,8 +26,8 @@ public class Price {
                 cents = Integer.parseInt(centMajor);
 
                 // ASCII value
-                if (centstring.charAt(3) >= '5') {
-
+                if (centstring.charAt(2) >= '0') {
+                    cents++;
                 }
             }
         }
@@ -38,21 +38,12 @@ public class Price {
 
     public Price(int dollars, int cents) {
         this.dollars = dollars;
-
-        //ensure that if the price is created using 2 integers, the cents integer will not be greater than 99
-        if(cents > 99) {
-            while (cents > 99) {
-                this.dollars++;
-                cents -= 100;
-            }
-        }
-        //ensure that if the price is created using a single digit int, that it is represented properly (i.e. 1 cent -> 01)
-        if(cents < 10 && cents > 0)
-        {
-            String centStr = String.format("%02d", cents);
-
-        }
         this.cents = cents;
+
+        while (this.cents > 99) {
+            this.dollars++;
+            this.cents -= 100;
+        }
     }
 
     public Price() {
@@ -68,12 +59,12 @@ public class Price {
         return Double.parseDouble(temp);
     }
 
-    /*Method to handle adding two prices together (updates calling price to be itself + the added price)*/
+    /** Method to handle adding two prices together (updates calling price to be itself + the added price) */
     public void add(Price other) {
         this.cents += other.getCents();
 
         //ensure that the total cents is not 100 or more
-        while (this.cents >= 100) {
+        while(this.cents >= 100) {
             this.dollars++;
             this.cents -= 100;
         }
@@ -81,16 +72,26 @@ public class Price {
         this.dollars += other.getDollars();
     }
 
-    /*Multiplies the Price by a given value*/
-    public void multiply(double multiplyBy)
-    {
-
-
+    /** Multiplies the Price by a given value */
+    public void multiply(double multiplyBy) {
+        if(multiplyBy > 0 ) {
+            double price = this.getTotal();
+            double newPrice = price * multiplyBy;
+            Price temp = new Price(newPrice);
+            this.cents = temp.getCents();
+            this.dollars = temp.getDollars();
+        }
+        else if (multiplyBy == 0) {
+            this.dollars = 0;
+            this.cents = 0;
+        }
+        else {
+            System.out.println("Error, attempted to multiply price by a negative value");
+        }
     }
 
-    /*Method to round cents if there are more than 2 digits worth of cents*/
-    private void roundCents()
-    {
+    /** Method to round cents if there are more than 2 digits worth of cents*/
+    private void roundCents() {
 
     }
 

@@ -41,6 +41,7 @@ public class Transaction {
 
     public Price getTotalPrice() {
         Price totalPrice = new Price(); //$00.00
+
         //add the prices for every item in the cart
         for(Product p : this.products) {
             totalPrice.add(p.getPrice());
