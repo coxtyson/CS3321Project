@@ -53,5 +53,6 @@ public class Transaction {
             double discountDecimal = this.discountPercentage / 100;
             totalPrice.multiply((1-discountDecimal));
         }
+        return totalPrice;
     }
 }
