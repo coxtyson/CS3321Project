@@ -50,8 +50,9 @@ public class Transaction {
         if(this.discountPercentage > 0)
         {
             //convert percent to decimal value
-            double discountDecimal = this.discountPercentage / 100;
+            double discountDecimal = this.discountPercentage / (double)100;
             totalPrice.multiply((1-discountDecimal));
         }
+        return totalPrice;
     }
 }
