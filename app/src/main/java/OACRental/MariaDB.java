@@ -40,7 +40,6 @@ public class MariaDB implements Database {
                     String newDatabaseName = "OAC";
                     Statement stmnt = connection.createStatement();
                     stmnt.executeUpdate(createDatabase + " " + newDatabaseName);
-                    System.out.println("random string2");
                     connection.close();
                     connection = DriverManager.getConnection(newPath + "/" + newDatabaseName, username, password);
                     stmnt = connection.createStatement();
