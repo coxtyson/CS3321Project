@@ -20,7 +20,7 @@ public class MariaDB implements Database {
 
             connection = DriverManager.getConnection(path, username, password);
 
-            if (!connection.isValid(timeoutSeconds)) {
+            if (connection == null || !connection.isValid(timeoutSeconds)) {
                 throw new Exception("MariaDB connection failed");
             }
         }

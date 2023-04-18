@@ -39,20 +39,19 @@ public class Transaction {
         return this.products;
     }
 
-    public Price getTotalPrice()
-    {
+    public Price getTotalPrice() {
         Price totalPrice = new Price(); //$00.00
+
         //add the prices for every item in the cart
-        for(Product p : this.products)
-        {
+        for(Product p : this.products) {
             totalPrice.add(p.getPrice());
         }
-        if(this.discountPercentage > 0)
-        {
+        if(this.discountPercentage > 0) {
             //convert percent to decimal value
             double discountDecimal = this.discountPercentage / (double)100;
             totalPrice.multiply((1-discountDecimal));
         }
+
         return totalPrice;
     }
 }

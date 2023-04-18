@@ -12,7 +12,11 @@
     -fx-padding: 50;
 }
 
-#grdProducts {
+#grdCheckoutProducts {
+    -fx-grid-lines-visible: true;
+}
+
+#grdInventoryProducts {
     -fx-grid-lines-visible: true;
 }
 
