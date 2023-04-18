@@ -85,6 +85,11 @@ public class InventoryViewerPage extends GridPane implements Page {
         ColumnConstraints columnQuantity = new ColumnConstraints();
         ColumnConstraints columnPrice = new ColumnConstraints();
 
+        columnName.setPercentWidth(25);
+        columnSize.setPercentWidth(25);
+        columnQuantity.setPercentWidth(25);
+        columnPrice.setPercentWidth(25);
+
         grdProducts.getColumnConstraints().addAll(columnName, columnSize, columnPrice, columnQuantity);
 
         grdProducts.autosize();

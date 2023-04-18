@@ -65,7 +65,7 @@ public class CheckoutPage extends GridPane implements Page {
         getColumnConstraints().addAll(mainCol, controlCol);
 
         dateCheckout.valueProperty().addListener((ov, oldValue, newValue) -> { checkoutDate = newValue; });
-        dateCheckout.valueProperty().addListener((ov, oldValue, newValue) -> { returnDate = newValue; });
+        dateReturn.valueProperty().addListener((ov, oldValue, newValue) -> { returnDate = newValue; });
 
         btnPrint.setOnAction(event -> {
             if(checkoutDate == null){
