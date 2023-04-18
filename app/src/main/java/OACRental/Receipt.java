@@ -163,6 +163,35 @@ public class Receipt {
                 stream.newLine();
             }
             stream.endText();
+            stream.beginText();
+            stream.newLineAtOffset(490, 570);
+            stream.setFont(PDType1Font.COURIER, 9);
+            for(int i = 0; i < products.size(); i ++){
+                stream.showText(products.get(i).getPrice().toString());
+                stream.newLine();
+            }
+            stream.endText();
+            stream.beginText();
+            stream.newLineAtOffset(490, 405);
+            stream.setFont(PDType1Font.COURIER, 9);
+            stream.showText(transaction.getTotalPrice().toString());
+            stream.endText();
+
+            Price taxPrice = transaction.getTotalPrice();
+            taxPrice.multiply(0.06);
+            stream.beginText();
+            stream.newLineAtOffset(490, 382);
+            stream.setFont(PDType1Font.COURIER, 9);
+            stream.showText(taxPrice.toString());
+            stream.endText();
+
+            Price totalPrice = transaction.getTotalPrice();
+            totalPrice.add(taxPrice);
+            stream.beginText();
+            stream.newLineAtOffset(490, 360);
+            stream.setFont(PDType1Font.COURIER, 9);
+            stream.showText(totalPrice.toString());
+            stream.endText();
         }
     }
 }

@@ -105,7 +105,5 @@ public class Price {
     }
 
     @Override
-    public String toString() {
-        return "$" + Integer.toString(dollars) + "." + Integer.toString(cents);
-    }
+    public String toString() { return "$" + Integer.toString(dollars) + "." + String.format("%02d", getCents()); }
 }
