@@ -22,12 +22,14 @@ public class Price {
                 cents = Integer.parseInt(centstring);
             }
             else if (centstring.length() > 2) {
-                String centMajor = centstring.substring(0, 3);
+                String centMajor = centstring.substring(0, 2);
                 cents = Integer.parseInt(centMajor);
 
-                // ASCII value
-                if (centstring.charAt(2) >= '0') {
-                    cents++;
+                for (int i = 2; i < centstring.length(); i++) {
+                    if (centstring.charAt(i) >= '0') {
+                        cents++;
+                        break;
+                    }
                 }
             }
         }
