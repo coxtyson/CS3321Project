@@ -1,3 +1,5 @@
+
+/* This section of style code controls theming related to the whole application */
 .root {
   -fx-accent: #c93046;
   -fx-default-button: #fd7088;
@@ -5,11 +7,26 @@
   -fx-faint-focus-color: #e3305d22;
 }
 
-#hboxMainNavButtons {
+/* These are the panels that contain the navigation buttons such visible everywhere, such as tasks and the back button  */
+#hboxMainNavButtons {}
+
+#vboxMainTaskButtons {}
+
+
+#vboxTransactionControls {
+    -fx-spacing: 20;
 }
 
 #pageCustomer {
     -fx-padding: 50;
+}
+
+#pageCheckout {
+    -fx-padding: 25;
+}
+
+#pageInventory {
+    -fx-padding: 25;
 }
 
 #grdCheckoutProducts {
