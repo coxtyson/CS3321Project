@@ -8,8 +8,16 @@
 #hboxMainNavButtons {
 }
 
+#vboxTransactionControls {
+    -fx-spacing: 20;
+}
+
 #pageCustomer {
     -fx-padding: 50;
+}
+
+#pageCheckout {
+    -fx-padding: 25;
 }
 
 #grdCheckoutProducts {

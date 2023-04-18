@@ -20,36 +20,54 @@ public class CheckoutPage extends GridPane implements Page {
     List<Product> cart;
 
     VBox vboxItems;
+    VBox vboxTransactionControls;
     LocalDate checkoutDate;
     LocalDate returnDate;
 
     public CheckoutPage(TaskView parent) {
         this.parent = parent;
+        setId("pageCheckout");
         vboxItems = new VBox();
+        vboxTransactionControls = new VBox();
+        vboxTransactionControls.setId("vboxTransactionControls");
+
 
         add(vboxItems, 0, 0);
-
-        // Gets the
-        TilePane dateSelectionTile = new TilePane();
-        DatePicker datePicker = new DatePicker();
-        dateSelectionTile.getChildren().add(datePicker);
-        add(dateSelectionTile, 2, 0);
+        add(vboxTransactionControls, 1, 0);
 
 
-        Button checkoutDateBtn = new Button("Checkout Date");
-        checkoutDateBtn.setOnAction(event -> {
-            checkoutDate = datePicker.getValue();
-        });
-        add(checkoutDateBtn, 2,1);
+        Label lblCheckoutDate = new Label("Checkout Date");
+        DatePicker dateCheckout = new DatePicker();
+        Label lblReturnDate = new Label("Return Date");
+        DatePicker dateReturn = new DatePicker();
+        Button btnPrint = new Button("Print Receipt");
 
-        Button returnDateBtn = new Button("Return Date");
-        returnDateBtn.setOnAction(event -> {
-            returnDate = datePicker.getValue();
-        });
-        add(returnDateBtn, 2,2);
+        checkoutDate = LocalDate.now();
+        returnDate = checkoutDate.plusDays(1);
 
-        Button btn = new Button("Print");
-        btn.setOnAction(event -> {
+        dateCheckout.setValue(checkoutDate);
+        dateReturn.setValue(returnDate);
+
+        vboxTransactionControls.getChildren().addAll(
+                lblCheckoutDate,
+                dateCheckout,
+                lblReturnDate,
+                dateReturn,
+                btnPrint
+        );
+
+        ColumnConstraints mainCol = new ColumnConstraints();
+        ColumnConstraints controlCol = new ColumnConstraints();
+
+        mainCol.setPercentWidth(60);
+        controlCol.setPercentWidth(40);
+
+        getColumnConstraints().addAll(mainCol, controlCol);
+
+        dateCheckout.valueProperty().addListener((ov, oldValue, newValue) -> { checkoutDate = newValue; });
+        dateCheckout.valueProperty().addListener((ov, oldValue, newValue) -> { returnDate = newValue; });
+
+        btnPrint.setOnAction(event -> {
             if(checkoutDate == null){
                 Dialog<String> dialog = new Dialog<>();
                 dialog.setTitle("Error");
@@ -105,7 +123,88 @@ public class CheckoutPage extends GridPane implements Page {
             }
         });
 
+
+        /*
+        // Gets the
+        DatePicker datePicker = new DatePicker();
+        add(datePicker, 2, 0);
+
+
+        Button checkoutDateBtn = new Button("Checkout Date");
+        checkoutDateBtn.setOnAction(event -> {
+            checkoutDate = datePicker.getValue();
+        });
+        add(checkoutDateBtn, 2,1);
+
+        Button returnDateBtn = new Button("Return Date");
+        returnDateBtn.setOnAction(event -> {
+            returnDate = datePicker.getValue();
+        });
+        add(returnDateBtn, 3,1);
+
+        Button btn = new Button("Print");
+        btn.setOnAction(event -> {
+            if(checkoutDate == null){
+                Dialog<String> dialog = new Dialog<>();
+                dialog.setTitle("Error");
+                dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+                dialog.setContentText("Please select a checkout date");
+
+                dialog.showAndWait();
+                return;
+            }
+
+            if(returnDate == null){
+                Dialog<String> dialog = new Dialog<>();
+                dialog.setTitle("Error");
+                dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+                dialog.setContentText("Please select a return date");
+
+                dialog.showAndWait();
+                return;
+            }
+
+            Transaction transaction = new Transaction(DataManager.getActiveCustomer(), DataManager.getCart(), checkoutDate, returnDate);
+
+            Receipt receipt = new Receipt();
+            receipt.setCustomer(DataManager.getActiveCustomer());
+            receipt.setItems(DataManager.getCart());
+            receipt.setTransaction(transaction);
+
+         */
+
+            // commented out printing to a printer
+            /*
+            try {
+                receipt.print();
+            }
+            catch (Exception ex) {
+                Dialog<String> dialog = new Dialog<>();
+                dialog.setTitle("Error");
+                dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+                dialog.setContentText("Printing could not be completed due to the following error: \n\n" + ex.toString());
+
+                dialog.showAndWait();
+            }
+            */
+        /*
+            // saves the reciept to a pdf
+            try {
+                receipt.save("OACRecieptTest.pdf");
+            }
+            catch (Exception ex) {
+                Dialog<String> dialog = new Dialog<>();
+                dialog.setTitle("Error");
+                dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+                dialog.setContentText("Saving could not be completed due to the following error: \n\n" + ex.toString());
+
+                dialog.showAndWait();
+            }
+        });
+
         add(btn, 0, 1);
+
+         */
     }
 
     @Override
