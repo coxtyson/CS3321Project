@@ -37,14 +37,6 @@ public class Customer {
         return lastName;
     }
 
-    public void setFirstName(String name) {
-        firstName = name;
-    }
-
-    public void setLastName(String name) {
-        lastName = name;
-    }
-
     public void setEmail(String email) {
         this.email = email;
     }

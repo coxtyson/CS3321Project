@@ -1,16 +1,15 @@
 package OACRental;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Calendar;
 public class Transaction {
     private Customer customer;
     private int discountPercentage;
     private List<Product> products;
-    private Date checkout;
-    private Date expectedReturn;
+    private LocalDate checkout;
+    private LocalDate expectedReturn;
 
-    public Transaction(Customer customer,List<Product> products, Date checkout,
-                       Date expectedReturn, int discountPercentage)
+    public Transaction(Customer customer,List<Product> products, LocalDate checkout,
+                       LocalDate expectedReturn, int discountPercentage)
     {
         this.customer = customer;
         this.products = products;
@@ -19,7 +18,7 @@ public class Transaction {
         this.discountPercentage = discountPercentage;
     }
 
-    public Transaction(Customer customer, List<Product> products, Date checkout, Date expectedReturn){
+    public Transaction(Customer customer, List<Product> products, LocalDate checkout, LocalDate expectedReturn){
         this(customer, products, checkout, expectedReturn, 0);
     }
 
@@ -29,10 +28,12 @@ public class Transaction {
     public int getDiscountPercentage(){
         return this.discountPercentage;
     }
-    public Date getCheckoutDate(){
+
+    public LocalDate getCheckout(){
         return this.checkout;
     }
-    public Date getExpectedReturnDate(){
+    public LocalDate getExpectedReturn(){
+
         return this.expectedReturn;
     }
     public List<Product> getProducts(){
