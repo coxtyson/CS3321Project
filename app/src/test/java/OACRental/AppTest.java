@@ -43,6 +43,7 @@ public class AppTest {
 
         Price testAddOne = new Price(1,1);
         assertEquals(testAddOne.getCents(), 1, 0, "1.01 should only have 1 cent");
+        assertEquals(1.01, testAddOne.getTotal(), "1.01 should have total of 1.01");
 
         Price testPriceDouble = new Price(2.99);
         assertEquals(testPriceDouble.getTotal(), 2.99, 0, "Double price constructor is working");
@@ -55,8 +56,8 @@ public class AppTest {
         /*Testing double constructor with a cent value that has more than 2 digits of decimal values*/
         Price testCentRounding1 = new Price(11.115);
         Price testCentRounding2 = new Price(11.1109);
-        assertEquals(testCentRounding1.getTotal(), 11.12, 0, "$11.115 should be rounded to $11.12");
-        assertEquals(testCentRounding2.getTotal(), 11.12, 0, "$11.1109 should be rounded to $11.12");
+        assertEquals(11.12, testCentRounding1.getTotal(), 0, "$11.115 should be rounded to $11.12");
+        assertEquals(11.12, testCentRounding2.getTotal(), 0, "$11.1109 should be rounded to $11.12");
 
         /*Testing multiply function*/
     }
@@ -115,6 +116,9 @@ public class AppTest {
         Date returnDate = new Date();
 
         Transaction testTransaction = new Transaction(testCustomer, testProducts, checkoutDate, returnDate);
+
+        assertNotNull(testTransaction, "Transaction should be created from constructor");
+        //assertEquals();
 
     }
 
