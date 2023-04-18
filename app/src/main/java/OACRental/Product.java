@@ -88,6 +88,12 @@ public class Product {
 
     public String getItems()
     {
-        return this.itemsInBundle;
+        if(this.isBundle == false)
+        {
+            return this.name;
+        }
+        else {
+            return this.itemsInBundle;
+        }
     }
 }

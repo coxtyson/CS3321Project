@@ -26,13 +26,13 @@ public class Transaction {
     public Customer getCustomer(){
         return this.customer;
     }
-    public int getDiscount(){
+    public int getDiscountPercentage(){
         return this.discountPercentage;
     }
-    public Date getCheckout(){
+    public Date getCheckoutDate(){
         return this.checkout;
     }
-    public Date getExpectedReturn(){
+    public Date getExpectedReturnDate(){
         return this.expectedReturn;
     }
     public List<Product> getProducts(){
