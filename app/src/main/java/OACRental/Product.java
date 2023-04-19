@@ -1,6 +1,7 @@
 package OACRental;
 
 public class Product {
+    private int databaseID;
     private String name;
     private String size;
     private int quantity;
@@ -11,7 +12,7 @@ public class Product {
     private boolean isActive;
 
     /*Base constructor for products that are not bundles*/
-    public Product(String name, String size, int quantity, Price price, boolean bundleOnly, boolean isActive){
+    public Product(String name, String size, int quantity, Price price, boolean bundleOnly, boolean isActive, int databaseID) {
         this.name = name;
         this.size = size;
         this.quantity = quantity;
@@ -21,6 +22,11 @@ public class Product {
 
         this.isBundle = false;
         this.itemsInBundle = null;
+        this.databaseID = databaseID;
+    }
+
+    public Product(String name, String size, int quantity, Price price, boolean bundleOnly, boolean isActive) {
+        this(name, size, quantity, price, bundleOnly, isActive, -1);
     }
 
     /*Product constructor for a product that does not have a size*/
@@ -85,6 +91,8 @@ public class Product {
             return name;
         }
     }
+
+    public int getDatabaseID() { return databaseID; }
 
     public String getItems()
     {

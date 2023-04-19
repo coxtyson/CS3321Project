@@ -1,8 +1,6 @@
 package OACRental;
 
-import javax.swing.plaf.nimbus.State;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.*;
@@ -106,7 +104,14 @@ public class MariaDB implements Database {
 
     @Override
     public Customer retrieveCustomer(String firstName, String lastName, String Phone, String ID, String email) {
-        return null;
+        var custs = this.retrieveCustomers(firstName, lastName, Phone, ID, email, false);
+
+        if (!custs.isEmpty()) {
+            return custs.get(0);
+        }
+        else {
+            return null;
+        }
     }
 
     /**
@@ -264,7 +269,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                return new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive);
+                return new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive, prodid);
             }
             else {
                 throw new Exception("No product with the name " + name);
@@ -278,7 +283,6 @@ public class MariaDB implements Database {
     @Override
     public Product retrieveProduct(String name, String size)
     {
-        /*
         if (name == null || name.isEmpty()) {
             return null;
         }
@@ -299,7 +303,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                Product prod = new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly);
+                Product prod = new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive);
                 return prod;
             }
             else {
@@ -310,8 +314,6 @@ public class MariaDB implements Database {
             System.out.println(ex.toString());
             return null;
         }
-        */
-        return null;
     }
     @Override
     public List<Product> retrieveAllProductsWithName(String name) {
@@ -367,11 +369,47 @@ public class MariaDB implements Database {
     @Override
     public void addProduct(Product product) {
         String sql = "INSERT INTO Products (Name, Size, Quantity, Price, IsActive, BundleOnly) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmnt = connection.prepareStatement(sql)) {
+            stmnt.setString(1, product.getName());
+            stmnt.setString(2, product.getSize());
+            stmnt.setInt(3, product.getQuantity());
+            stmnt.setDouble(4, product.getPrice().getTotal());
+            stmnt.setBoolean(5, product.isActive());
+            stmnt.setBoolean(6, product.isBundleOnly());
+
+            stmnt.executeUpdate();
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
     }
 
     @Override
     public void updateProduct(Product productOriginal, Product productUpdated) {
+        int id = productOriginal.getDatabaseID();
 
+        if (id == -1) {
+            throw new IllegalArgumentException("Original product not in database, make sure to use an object produced by a database call");
+        }
+
+        String sql = "UPDATE Products SET Name=(?), Size=(?), Quantity=(?), Price=(?), IsActive=(?), BundleOnly=(?) WHERE ID=(?)";
+
+        try (var stmnt = connection.prepareStatement(sql)) {
+            stmnt.setString(1, productUpdated.getSize());
+            stmnt.setString(2, productOriginal.getName());
+            stmnt.setInt(3, productOriginal.getQuantity());
+            stmnt.setDouble(4, productOriginal.getPrice().getTotal());
+            stmnt.setBoolean(5, productOriginal.isActive());
+            stmnt.setBoolean(6, productOriginal.isBundleOnly());
+
+            stmnt.setInt(7, id);
+
+            stmnt.executeUpdate();
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
     }
 
     @Override
