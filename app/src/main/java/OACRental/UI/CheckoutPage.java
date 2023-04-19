@@ -28,6 +28,7 @@ public class CheckoutPage extends GridPane implements Page {
         this.parent = parent;
         setId("pageCheckout");
         vboxItems = new VBox();
+        vboxItems.setId("vboxItemsBought");
         vboxTransactionControls = new VBox();
         vboxTransactionControls.setId("vboxTransactionControls");
 
@@ -41,6 +42,12 @@ public class CheckoutPage extends GridPane implements Page {
         Label lblReturnDate = new Label("Return Date");
         DatePicker dateReturn = new DatePicker();
         Button btnPrint = new Button("Print Receipt");
+
+        lblCheckoutDate.setId("lblCheckoutDate");
+        dateCheckout.setId("dateCheckout");
+        lblReturnDate.setId("lblReturnDate");
+        dateReturn.setId("dateReturn");
+        btnPrint.setId("btnPrint");
 
         checkoutDate = LocalDate.now();
         returnDate = checkoutDate.plusDays(1);

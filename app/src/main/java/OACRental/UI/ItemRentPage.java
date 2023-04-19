@@ -5,6 +5,7 @@ import OACRental.Price;
 import OACRental.Product;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 
@@ -57,11 +58,24 @@ public class ItemRentPage extends GridPane implements Page {
         scrllCart.setId("scrllCart");
 
         Label lblCartHeader = new Label("Cart");
+        lblCartHeader.setId("lblCartHeader");
         lblTotal = new Label("Total: $0.00");
+
         Button btnCartCheckout = new Button("Checkout");
+        Button btnCartClear = new Button("Clear Cart");
+
+        btnCartCheckout.setId("btnCartCheckout");
+        btnCartClear.setId("btnCartClear");
 
         btnCartCheckout.setOnAction(event -> {
-            parent.nextPage();
+            if (!DataManager.getCart().isEmpty()) {
+                parent.nextPage();
+            }
+        });
+
+        btnCartClear.setOnAction(event -> {
+            DataManager.clearCart();
+            updateCart();
         });
 
         scrllProducts.setContent(grdProducts);
@@ -72,8 +86,23 @@ public class ItemRentPage extends GridPane implements Page {
         scrllCart.setContent(vboxCart);
         grdCart.add(lblCartHeader, 0, 0);
         grdCart.add(scrllCart, 0, 1);
-        grdCart.add(lblTotal, 0, 2);
-        grdCart.add(btnCartCheckout, 0, 3);
+
+        VBox vboxCartTotalAndControls = new VBox();
+        HBox hboxCartButtons = new HBox();
+
+        vboxCartTotalAndControls.setId("vboxCartTotalAndControls");
+        hboxCartButtons.setId("hboxCartButtons");
+
+        vboxCartTotalAndControls.setAlignment(Pos.CENTER);
+        hboxCartButtons.setAlignment(Pos.CENTER);
+
+        vboxCartTotalAndControls.getChildren().add(lblTotal);
+        vboxCartTotalAndControls.getChildren().add(hboxCartButtons);
+
+        hboxCartButtons.getChildren().add(btnCartCheckout);
+        hboxCartButtons.getChildren().add(btnCartClear);
+
+        grdCart.add(vboxCartTotalAndControls, 0, 2);
 
         GridPane.setHalignment(lblCartHeader, HPos.CENTER);
         GridPane.setHalignment(lblTotal, HPos.CENTER);
@@ -128,8 +157,18 @@ public class ItemRentPage extends GridPane implements Page {
             Button btnProdAdd = new Button("Add to cart");
 
             btnProdAdd.setOnAction(event -> {
-                DataManager.addProductToCart(prod);
-                updateCart();
+                try {
+                    DataManager.addProductToCart(prod);
+                    updateCart();
+                }
+                catch (IllegalArgumentException ex) {
+                    Dialog<String> dialog = new Dialog<>();
+                    dialog.setTitle("Error");
+                    dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+                    dialog.setContentText(ex.getMessage());
+
+                    dialog.showAndWait();
+                }
             });
 
             grdProducts.add(lblProdName, 0, row);
@@ -179,6 +218,7 @@ public class ItemRentPage extends GridPane implements Page {
 
     @Override
     public void update() {
+        DataManager.clearCart();
         updateCart();
     }
 }

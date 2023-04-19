@@ -4,6 +4,8 @@ package OACRental.UI;
 import OACRental.DataManager;
 import OACRental.SettingsManager;
 import javafx.application.Application;
+import javafx.scene.Parent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.Node;
 import javafx.stage.Stage;
@@ -11,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UI extends Application {
     ArrayList<TaskView> tasks;
@@ -75,7 +78,7 @@ public class UI extends Application {
         ColumnConstraints col1 = new ColumnConstraints();
         ColumnConstraints col2 = new ColumnConstraints();
 
-        col1.setPrefWidth(100);
+        col1.setMinWidth(100);  // This is set to min width instead of prefwidth to 100% guarantee the nav buttons are always visible
         col2.setFillWidth(true);
         col2.setHgrow(Priority.ALWAYS);
 
@@ -121,10 +124,60 @@ public class UI extends Application {
 
         Scene scene = initUI();
 
+        scene.setOnKeyReleased(event -> {
+            if (event.getCode() == KeyCode.CLOSE_BRACKET) {  // Keycode close bracket is the ']' symbol
+                this.debugDumpSceneHierarchy(scene.getRoot(), 0, null);
+            }
+        });
+
         scene.getStylesheets().add("style.css");
 
         primaryStage.setScene(scene);
 
         primaryStage.show();
     }
+
+    private void debugDumpSceneHierarchy(Node node, int depth, List<String> hierarchy_ids) {
+        List<String> ids = null;
+
+        if (hierarchy_ids == null) {
+            ids = new ArrayList<>();
+        }
+        else {
+            ids = hierarchy_ids;
+        }
+
+        for (String previd : ids) {
+            if (previd.equals(node.getId())) {
+                throw new RuntimeException("Two nodes have the same id of " + previd);
+            }
+            else if (node.getId() != null) {
+                ids.add(node.getId());
+            }
+        }
+
+        StringBuilder linebuilder = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            linebuilder.append("-");
+        }
+
+        String classname = node.getClass().getName();
+        String[] namecomps = classname.split("\\.");
+        String singlewordname = namecomps[namecomps.length - 1];
+
+        linebuilder.append(" ");
+        linebuilder.append("[").append(singlewordname).append("]");
+        linebuilder.append("[").append(node.getId()).append("]");
+
+        System.out.println(linebuilder.toString());
+
+        if (node instanceof Parent) {
+            Parent parent = (Parent) node;
+
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                debugDumpSceneHierarchy(child, depth + 1, ids);
+            }
+        }
+    }
+
 }

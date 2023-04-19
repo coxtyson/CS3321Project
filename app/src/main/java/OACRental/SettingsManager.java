@@ -19,26 +19,29 @@ public class SettingsManager {
         settings.put("database-username", "");
         settings.put("database-password", "");
         settings.put("database-name", "OAC");
+        settings.put("customer-show-email", false);
+        settings.put("customer-show-phone", false);
     }
 
 
     public static void loadOrCreateSettings() {
+        applyDefaults();
         File config = new File(configFilePath);
 
         if (config.exists()) {
             JSONParser parser = new JSONParser();
 
             try (var reader = new FileReader(configFilePath)) {
-                settings = (JSONObject) parser.parse(reader);
+                var newsettings = (JSONObject) parser.parse(reader);
+                for (var key : newsettings.keySet()) {
+                    settings.put(key, newsettings.get(key));
+                }
             }
             catch (Exception ex) {
                 System.out.println("Unable to read config, applying default settings");
-                applyDefaults();
             }
         }
         else {
-            applyDefaults();
-
             try (var file = new FileWriter(configFilePath)) {
                 file.write(settings.toJSONString());
             }

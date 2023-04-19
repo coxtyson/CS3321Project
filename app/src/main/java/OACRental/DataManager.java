@@ -73,19 +73,32 @@ public class DataManager {
 
         return cart;
     }
-    public static void addProductToCart(Product product) {
-        if (cart == null) {
-            cart = new ArrayList<>();
-        }
 
-        cart.add(product);
+    public static void clearCart() {
+        if (cart != null) {
+            cart.clear();
+        }
     }
-    public static void clearActiveTransaction() {
+
+    public static void addProductToCart(Product product) throws IllegalArgumentException {
         if (cart == null) {
             cart = new ArrayList<>();
         }
 
-        cart.clear();
+        int qty = 0;
+        for (Product prod : cart) {
+            if (prod.equals(product)) {
+                qty += 1;
+            }
+        }
+
+        if (qty < product.getQuantity()) {
+            cart.add(product);
+        }
+        else {
+            throw new IllegalArgumentException("Can't put more in cart than there is quanity in stock!");
+        }
+
     }
 
     public static List<Customer> searchCustomers(String first, String last, String phone, String id, String email, boolean fuzzy) {
