@@ -39,7 +39,7 @@ public class DataManager {
      * @param username the name of the database user to connect with
      * @param password the user's password
      */
-    public static void connectToDatabase(String url, int port, String databaseName, String username, String password) {
+    public static void connectToDatabase(String url, int port, String databaseName, String username, String password) throws Exception {
         if (database != null && database.isConnected()) {
             database.close();
         }
@@ -102,10 +102,14 @@ public class DataManager {
     }
 
     public static List<Customer> searchCustomers(String first, String last, String phone, String id, String email, boolean fuzzy) {
-        return database.retrieveCustomers(first, last, phone, id, email, fuzzy);
+        return database == null ? new ArrayList<>() : database.retrieveCustomers(first, last, phone, id, email, fuzzy);
     }
 
     public static void createCustomer(String first, String last, String ID, String phone, String email) {
+        if (database == null) {
+            return;
+        }
+
         if(database.retrieveCustomer(first, last, ID, phone, email) == null){
             Customer newCustomer = new Customer(first, last, ID, phone, email);
             setActiveCustomer(newCustomer);
@@ -128,7 +132,7 @@ public class DataManager {
     }
 
     public static List<Product> getAllProducts() {
-        return database.getAllProducts();
+        return database == null ? new ArrayList<>() : database.getAllProducts();
     }
 
     public static List<TransactionRecord> getTransactionRecords(Customer customer){

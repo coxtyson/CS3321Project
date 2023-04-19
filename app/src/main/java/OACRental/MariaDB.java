@@ -1,18 +1,22 @@
 package OACRental;
 
 import javax.swing.plaf.nimbus.State;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MariaDB implements Database {
     private static final int timeoutSeconds = 5;
     private Connection connection;
 
-    public MariaDB(String url, int port, String databaseName, String username, String password) {
+    public MariaDB(String url, int port, String databaseName, String username, String password) throws Exception {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
 
@@ -21,72 +25,54 @@ public class MariaDB implements Database {
             connection = DriverManager.getConnection(path, username, password);
 
             if (connection == null || !connection.isValid(timeoutSeconds)) {
-                throw new Exception("MariaDB connection failed");
+                throw new Exception("MariaDB connection failed for unknown reasn");
             }
         }
         catch (Exception ex) {
-            System.out.println("Mariadb connection failed with reason:");
-            System.out.println(ex.getMessage());
-            // If Mariadb doesn't contain an OAC database this if statement creates a OAC database
-            if(ex.getMessage().contains("Unknown database")){
-                connection = null;
-                System.out.println("random string");
 
-                try{
+            // If Mariadb doesn't contain an OAC database this if statement creates a OAC database
+            if(ex.getMessage().contains("Unknown database")) {
+                try {
                     String newPath = "jdbc:mysql://" + url + ":" + port;
                     connection = DriverManager.getConnection(newPath, username, password);
-                    // creating the new database
-                    String createDatabase = "CREATE DATABASE ";
-                    String newDatabaseName = "OAC";
-                    Statement stmnt = connection.createStatement();
-                    stmnt.executeUpdate(createDatabase + " " + newDatabaseName);
+                    connection.prepareStatement("CREATE DATABASE OAC").executeUpdate();
                     connection.close();
-                    connection = DriverManager.getConnection(newPath + "/" + newDatabaseName, username, password);
-                    stmnt = connection.createStatement();
-                    // creating the customers table
-                    String createCustTable = "CREATE TABLE Customers(ID INTEGER NOT NULL AUTO_INCREMENT," +
-                            " FirstName VARCHAR(1000)," +
-                            " Identification VARCHAR(1000) NOT NULL," +
-                            " Phone VARCHAR(1000)," +
-                            " Email VARCHAR(1000)," +
-                            " PRIMARY KEY (ID));";
-                    stmnt.executeUpdate(createCustTable);
 
-                    // creating the products table
-                    String createProductTable = "CREATE TABLE Products(" +
-                            "ID INTEGER NOT NULL AUTO_INCREMENT," +
-                            " Name VARCHAR(1000)," +
-                            " Size VARCHAR(1000)," +
-                            " Quantity INTEGER," +
-                            " Price DOUBLE," +
-                            " IsActive BOOL," +
-                            " BundleOnly BOOL," +
-                            " PRIMARY KEY(ID));";
-                    stmnt.executeUpdate(createProductTable);
+                    // Read file contents to string
+                    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+                    InputStream is = classloader.getResourceAsStream("createdb.sql");
+                    String sqlFileContents = new BufferedReader(new InputStreamReader(is)).lines().parallel().collect(Collectors.joining("\n"));
 
-                    // creates Bundles table
-                    String createBundleTable = "CREATE TABLE Bundles(ID INTEGER NOT NULL AUTO_INCREMENT," +
-                            " Name VARCHAR(1000) NOT NULL," +
-                            " Products VARCHAR(1000)," +
-                            " PRIMARY KEY(ID));";
-                    stmnt.executeUpdate(createBundleTable);
+                    // Break file contents into individual statements, including empty statements and comments
+                    String[] fileParts = sqlFileContents.split("\\n\\n");
 
-                    // creates Transactions table
-                    String createTransactionsTable = "CREATE TABLE Transactions(" +
-                            "ID INT NOT NULL AUTO_INCREMENT," +
-                            " CustID INT NOT NULL," +
-                            " Notes VARCHAR(10000)," +
-                            " Checkout DATETIME," +
-                            " ExpectedReturn DATETIME," +
-                            " PRIMARY KEY(ID));";
-                    stmnt.executeUpdate(createTransactionsTable);
+                    List<String> statements = new ArrayList<>();
+
+                    // Strip out comments and empty lines
+                    for (String line : fileParts) {
+                        String trimmed = line.trim();
+
+                        if (!trimmed.startsWith("--")) {
+                            statements.add(trimmed);
+                        }
+                    }
+
+                    connection = DriverManager.getConnection(newPath + "/" + "OAC", username, password);
+
+                    // Execute all the valid statements
+                    for (String sql : statements) {
+                        connection.prepareStatement(sql).executeUpdate();
+                    }
                 }
 
-                catch (Exception newEx){
-                    System.out.println("Mariadb connection failed with reason:");
-                    System.out.println(newEx.getMessage());
+                catch (Exception newEx) {
+                    throw new Exception("Failed to create OAC database. Is your SQL laid out correctly?\n\nOriginal Err:\n" + newEx.getMessage());
                 }
 
+            }
+            else {
+                // Rethrow so the UI can catch
+                throw ex;
             }
         }
 

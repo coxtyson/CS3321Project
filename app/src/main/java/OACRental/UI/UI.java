@@ -5,6 +5,9 @@ import OACRental.DataManager;
 import OACRental.SettingsManager;
 import javafx.application.Application;
 import javafx.scene.Parent;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.Node;
@@ -118,8 +121,12 @@ public class UI extends Application {
             );
         }
         catch (Exception ex) {
-            System.out.println("Failed initial connection to database with reason:");
-            System.out.println(ex.getMessage());
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Error");
+            dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+            dialog.setContentText("Failed to connect with the database.\nAre your database settings correct?\n\nError:\n\n" + ex.toString());
+
+            dialog.showAndWait();
         }
 
         Scene scene = initUI();
