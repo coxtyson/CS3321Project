@@ -25,7 +25,7 @@ public class MariaDB implements Database {
             connection = DriverManager.getConnection(path, username, password);
 
             if (connection == null || !connection.isValid(timeoutSeconds)) {
-                throw new Exception("MariaDB connection failed for unknown reasn");
+                throw new Exception("MariaDB connection failed for unknown reason");
             }
         }
         catch (Exception ex) {
@@ -52,7 +52,7 @@ public class MariaDB implements Database {
                     for (String line : fileParts) {
                         String trimmed = line.trim();
 
-                        if (!trimmed.startsWith("--")) {
+                        if (!trimmed.startsWith("--") && !trimmed.isEmpty()) {
                             statements.add(trimmed);
                         }
                     }
