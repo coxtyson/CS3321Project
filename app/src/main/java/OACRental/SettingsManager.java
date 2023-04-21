@@ -21,6 +21,7 @@ public class SettingsManager {
         settings.put("database-name", "OAC");
         settings.put("customer-show-email", false);
         settings.put("customer-show-phone", false);
+        settings.put("style", "light");
     }
 
 

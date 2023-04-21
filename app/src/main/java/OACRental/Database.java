@@ -21,6 +21,7 @@ public interface Database {
         public List<Product> bundleToComponents(String name);
         public List<Product> bundleToComponents(Product product);
         public List<Product> getAllProducts();
+        public List<Product> searchProducts(String name, String size, boolean fuzzy);
 
         public void addCustomer(Customer customer);
         public void addProduct(Product product);

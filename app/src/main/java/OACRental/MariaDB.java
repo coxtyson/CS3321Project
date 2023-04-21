@@ -440,7 +440,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive));
+                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive, prodid));
             }
         }
         catch (Exception ex) {
@@ -450,5 +450,59 @@ public class MariaDB implements Database {
         }
 
         return prods;
+    }
+
+    @Override
+    public List<Product> searchProducts(String name, String size, boolean fuzzy) {
+        if ((name == null || name.isEmpty()) && (size == null || size.isEmpty())) {
+            return this.getAllProducts();
+        }
+
+        // With these methods that have the boolean "fuzzy" toggle, right now it's ignored and it always fuzzy searches,
+        // but to enable it, you'd just make it so if fuzzy is false, it doesn't append the % signs when building the statement
+
+        String sql = "SELECT * FROM Products WHERE ";
+        List<String> parameters = new ArrayList<>();
+
+        if (name != null && !name.isEmpty()) {
+            sql += " Name LIKE (?)";
+            parameters.add(name.trim());
+        }
+
+        if (size != null && !size.isEmpty()) {
+            if (!parameters.isEmpty()) {
+                sql += " AND";
+            }
+
+            sql += "Size LIKE (?)";
+            parameters.add(size.trim());
+        }
+
+        try (var stmnt = connection.prepareStatement(sql)) {
+            for(int i = 0; i < parameters.size(); i++) {
+                stmnt.setString(i  + 1, "%" + parameters.get(i) + "%");
+            }
+
+            ResultSet results = stmnt.executeQuery();
+
+            ArrayList<Product> prods = new ArrayList<>();
+
+            while(results.next()) {
+                int prodid = results.getInt(1);
+                String prodName = results.getString(2);
+                String prodSize = results.getString(3);
+                int prodQuant = results.getInt(4);
+                double prodPrice = results.getDouble(5);
+                boolean prodIsActive = results.getBoolean(6);
+                boolean prodBundleOnly = results.getBoolean(7);
+
+                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive, prodid));
+            }
+
+            return prods;
+        }
+        catch (Exception ex) {
+            return new ArrayList<>();
+        }
     }
 }

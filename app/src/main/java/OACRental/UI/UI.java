@@ -17,11 +17,13 @@ import javafx.scene.control.Button;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UI extends Application {
     ArrayList<TaskView> tasks;
     TaskView currentTask;
 
+    Scene scene;
     GridPane mainpane;
 
 
@@ -129,7 +131,7 @@ public class UI extends Application {
             dialog.showAndWait();
         }
 
-        Scene scene = initUI();
+        scene = initUI();
 
         scene.setOnKeyReleased(event -> {
             if (event.getCode() == KeyCode.CLOSE_BRACKET) {  // Keycode close bracket is the ']' symbol
@@ -137,22 +139,25 @@ public class UI extends Application {
             }
         });
 
-        scene.getStylesheets().add("style.css");
+        setStyle(SettingsManager.getSetting("style") + ".css");
 
         primaryStage.setScene(scene);
 
         primaryStage.show();
     }
 
+    public void setStyle(String name) {
+        if (!scene.getStylesheets().isEmpty()) {
+            scene.getStylesheets().clear();
+        }
+
+        scene.getStylesheets().add(name);
+    }
+
     private void debugDumpSceneHierarchy(Node node, int depth, List<String> hierarchy_ids) {
         List<String> ids = null;
 
-        if (hierarchy_ids == null) {
-            ids = new ArrayList<>();
-        }
-        else {
-            ids = hierarchy_ids;
-        }
+        ids = Objects.requireNonNullElseGet(hierarchy_ids, ArrayList::new);
 
         for (String previd : ids) {
             if (previd.equals(node.getId())) {

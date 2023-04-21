@@ -6,8 +6,14 @@ public class Price {
     protected int dollars;
     protected int cents;
 
-    public Price(double value) {
-        String[] components = Double.toString(value).split("\\.");
+    public Price(String string) {
+        String copy = string;  // Shallow copy at first
+
+        if (copy.startsWith("$")) {
+            copy = copy.substring(1); // Will deep copy without the $
+        }
+
+        String[] components = copy.split("\\.");
         dollars = 0;
         cents = 0;
 
@@ -36,6 +42,10 @@ public class Price {
         else if (components.length == 1) {
             dollars = Integer.parseInt(components[0]);
         }
+    }
+
+    public Price(double value) {
+        this(Double.toString(value));
     }
 
     public Price(int dollars, int cents) {

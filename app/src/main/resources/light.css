@@ -84,6 +84,7 @@ Black            #333333;
 #pageCheckout {
     -fx-padding: 25;
 }
+
 #vboxItemsBought {}
 #vboxTransactionControls {
     -fx-spacing: 20;
@@ -104,12 +105,30 @@ Black            #333333;
 
 
 
+/* Inventory viewer task/page controls */
 
 
 #pageInventory {
     -fx-padding: 25;
 }
 
-#grdInventoryProducts {
-    -fx-grid-lines-visible: true;
+#vboxProdSearch {
+    -fx-spacing: 20;
+    -fx-padding: 25;
+    -fx-max-width: 500;
 }
+
+#vboxProdName {}
+#lblProdName {}
+#txtProdName {}
+
+#vboxProdSize {}
+#lblProdSize {}
+#txtProdSize {}
+
+#scrllProducts {
+    -fx-max-width: 750;
+    -fx-max-height: 1000;
+}
+
+#tblProducts {}

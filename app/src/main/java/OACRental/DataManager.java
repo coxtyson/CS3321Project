@@ -147,13 +147,6 @@ public class DataManager {
     }
 
     public static List<Product> searchInventory(String name, String size) {
-        if(size == null || size.isEmpty()) {
-            return database.retrieveAllProductsWithName(name);
-        }
-        else{
-            ArrayList<Product> products = new ArrayList<Product>();
-            products.add(database.retrieveProduct(name, size));
-            return products;
-        }
+        return database.searchProducts(name, size, true);
     }
 }
