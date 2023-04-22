@@ -1,6 +1,9 @@
 package OACRental.UI;
 
 import javafx.scene.Node;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
@@ -58,18 +61,26 @@ public abstract class TaskView extends StackPane {
     }
 
     public void jumpPage(int page) {
-        if (page >= 0 && page <= pages.size() - 1) {
-            getChildren().clear();
+        try {
+            if (page >= 0 && page <= pages.size() - 1) {
+                getChildren().clear();
 
-            Node pageObject = pages.get(page);
-            getChildren().add(pageObject);
+                Node pageObject = pages.get(page);
+                getChildren().add(pageObject);
 
-            if (pageObject instanceof Page) {
-                ((Page) pageObject).update();
+                if (pageObject instanceof Page) {
+                    ((Page) pageObject).update();
+                }
+            } else {
+                throw new IllegalArgumentException("Illegal page number %d in CheckouTask".formatted(page));
             }
         }
-        else {
-            throw new IllegalArgumentException("Illegal page number %d in CheckouTask".formatted(page));
+        catch (Exception ex) {
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Error");
+            dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+            dialog.setContentText("The page failed to load due to the following error:\n\n" + ex.getMessage());
+            dialog.showAndWait();
         }
     }
 }

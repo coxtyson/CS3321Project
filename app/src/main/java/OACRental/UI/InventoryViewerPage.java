@@ -4,7 +4,6 @@ import OACRental.DataManager;
 import OACRental.Price;
 import OACRental.Product;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;

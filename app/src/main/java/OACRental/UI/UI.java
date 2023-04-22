@@ -15,6 +15,9 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +26,7 @@ public class UI extends Application {
     ArrayList<TaskView> tasks;
     TaskView currentTask;
 
-    Scene scene;
+    static Scene scene; // Static, this app only ever uses one scene
     GridPane mainpane;
 
 
@@ -115,11 +118,11 @@ public class UI extends Application {
 
         try {
             DataManager.connectToDatabase(
-                    (String) SettingsManager.getSetting("database-url"),
-                    (int) SettingsManager.getSetting("database-port"),
-                    (String) SettingsManager.getSetting("database-name"),
-                    (String) SettingsManager.getSetting("database-username"),
-                    (String) SettingsManager.getSetting("database-password")
+                    (String) SettingsManager.getSettingValue("Database URL"),
+                    (int) SettingsManager.getSettingValue("Database Port"),
+                    (String) SettingsManager.getSettingValue("Database Name"),
+                    (String) SettingsManager.getSettingValue("Database Username"),
+                    (String) SettingsManager.getSettingValue("Database Password")
             );
         }
         catch (Exception ex) {
@@ -139,19 +142,27 @@ public class UI extends Application {
             }
         });
 
-        setStyle(SettingsManager.getSetting("style") + ".css");
+        setStyle((String) SettingsManager.getSettingValue("Theme"));
 
         primaryStage.setScene(scene);
 
         primaryStage.show();
     }
 
-    public void setStyle(String name) {
+    public static void setStyle(String name) {
+        URL u = UI.class.getResource("/" + name + ".css");
+
+        if (u == null) {
+            System.out.println("Not applying style " + name + ", file not found");
+            return;
+        }
+
+
         if (!scene.getStylesheets().isEmpty()) {
             scene.getStylesheets().clear();
         }
 
-        scene.getStylesheets().add(name);
+        scene.getStylesheets().add(name + ".css");
     }
 
     private void debugDumpSceneHierarchy(Node node, int depth, List<String> hierarchy_ids) {

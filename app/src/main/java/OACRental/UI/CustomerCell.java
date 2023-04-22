@@ -20,11 +20,11 @@ public class CustomerCell extends ListCell<Customer> {
         else {
             String base = customer.getFullName() + "\n" + customer.getID();
 
-            if ((boolean) SettingsManager.getSetting("customer-show-email")) {
+            if ((boolean) SettingsManager.getSettingValue("Show Customer Email")) {
                 base += (customer.getEmail() == null ? "\nNo Email" : "\n" + customer.getEmail());
             }
 
-            if ((boolean) SettingsManager.getSetting("customer-show-phone")) {
+            if ((boolean) SettingsManager.getSettingValue("Show Customer Phone")) {
                 base += (customer.getPhone() == null ? "\nNo Phone" : "\n" + customer.getPhone());
             }
 

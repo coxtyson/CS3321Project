@@ -7,14 +7,8 @@ import OACRental.UI.UI;
 import javafx.application.Application;
 
 public class App {
-    static UI userInterface;
-
     public static void main(String[] args) {
-        userInterface = new UI();
+        UI userInterface = new UI();
         Application.launch(userInterface.getClass());
-    }
-
-    public static void setStyle(String styleName) {
-        userInterface.setStyle(styleName);
     }
 }

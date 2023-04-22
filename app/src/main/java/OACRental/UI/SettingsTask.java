@@ -2,7 +2,8 @@ package OACRental.UI;
 
 public class SettingsTask extends TaskView {
     public SettingsTask() {
-        // TODO: add pages
+        addPage(new SettingsPage());
+        jumpPage(0);
     }
 
     @Override
