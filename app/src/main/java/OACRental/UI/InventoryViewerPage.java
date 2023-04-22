@@ -3,18 +3,18 @@ package OACRental.UI;
 import OACRental.DataManager;
 import OACRental.Price;
 import OACRental.Product;
-import com.google.common.collect.Table;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Paint;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
-import javax.swing.*;
 import java.util.List;
 
 public class InventoryViewerPage extends GridPane implements Page {
@@ -26,11 +26,15 @@ public class InventoryViewerPage extends GridPane implements Page {
 
     TableView<Product> tblProducts;
 
+    ObservableList<Product> observableProducts;
     ScrollPane scrllProducts;
 
     public InventoryViewerPage(TaskView parent) {
         setId("pageInventory");
         this.parent = parent;
+
+        observableProducts = FXCollections.observableArrayList();
+
 
         Label lblProductName = new Label("Product Name");
         Label lblProductSize = new Label("Product Size");
@@ -62,16 +66,104 @@ public class InventoryViewerPage extends GridPane implements Page {
         tblProducts = new TableView<>();
         tblProducts.setId("tblProducts");
 
+        setupTableView();
+
+
+        scrllProducts = new ScrollPane();
+        scrllProducts.setId("scrllInventoryProducts");
+        scrllProducts.setContent(tblProducts);
+        scrllProducts.fitToWidthProperty().set(true);
+        scrllProducts.fitToHeightProperty().set(true);
+
+        ColumnConstraints onlyCol = new ColumnConstraints();
+        onlyCol.setPercentWidth(100);
+
+        getColumnConstraints().add(onlyCol);
+
+        RowConstraints row1 = new RowConstraints();
+        RowConstraints row2 = new RowConstraints();
+
+        row1.setPercentHeight(20);
+        row2.setPercentHeight(80);
+
+        getRowConstraints().addAll(row1, row2);
+
+        add(vboxProdSearch, 0, 0);
+        add(scrllProducts, 0, 1);
+
+        setHalignment(vboxProdSearch, HPos.CENTER);
+        setHalignment(scrllProducts, HPos.CENTER);
+
+        // Now, you may wonder what this negative margin does. Good question. I just know it makes it less ugly
+        setMargin(vboxProdSearch, new Insets(-50));
+        setMargin(tblProducts, new Insets(-50));
+
+        search();
+    }
+
+    private void setupTableView() {
+
+        // Here's a breakdown of what this is doing
+
+        // Create a column for the table
         TableColumn firstCol = new TableColumn("Name");
-        firstCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        // Set the value factory, which is in charge of getting the text to put in the boxes from the item.
+        // So in this case, it's supposed to pull the product name from the Product object and put in the box
+        firstCol.setCellValueFactory(new PropertyValueFactory<Product, String>("name"));
+
+        // Set the cell factory, which is in charge of making the actual cells. So this factory makes text
+        // box cells that you can type into
         firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
+        // Set the onEditCommit callback, so when you're done typing and hit "enter", the product is actually updated
+        firstCol.setOnEditCommit(e -> {
+            try {
+                var event = (TableColumn.CellEditEvent<Product, String>) e;
+                Product prod = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                prod.setName(event.getNewValue());
+                updateProduct(prod);
+            }
+            catch (Exception ex) {
+                displayError(ex);
+            }
+        });
+
+
+
+        // The rest of the cells follow a similar pattern, though the ones with more exotic data types
+        // necessitated some custom implementations to convert back and forth between strings
+
+
+
         TableColumn secondCol = new TableColumn("Size");
-        secondCol.setCellValueFactory(new PropertyValueFactory<>("size"));
+        secondCol.setCellValueFactory(new PropertyValueFactory<Product, String>("size"));
         secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        secondCol.setOnEditCommit(e -> {
+            try {
+                var event = (TableColumn.CellEditEvent<Product, String>) e;
+                Product prod = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                prod.setSize(event.getNewValue());
+                updateProduct(prod);
+            }
+            catch (Exception ex) {
+                displayError(ex);
+            }
+        });
 
         TableColumn thirdCol = new TableColumn("Quantity");
-        thirdCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        thirdCol.setCellValueFactory(new PropertyValueFactory<Product, Integer>("quantity"));
+        thirdCol.setOnEditCommit(e -> {
+            try {
+                var event = (TableColumn.CellEditEvent<Product, Integer>) e;
+                Product prod = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                prod.setQuantity(event.getNewValue());
+                updateProduct(prod);
+            }
+            catch (Exception ex) {
+                displayError(ex);
+            }
+        });
 
         // This shit is some real voodoo magic imma be honest that I wrote by decompiling JavaFX and
         // reverse engineering their shit
@@ -107,7 +199,8 @@ public class InventoryViewerPage extends GridPane implements Page {
         });
 
         TableColumn fourthCol = new TableColumn("Price");
-        fourthCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+        fourthCol.setCellValueFactory(new PropertyValueFactory<Product, Price>("price"));
+
 
         fourthCol.setCellFactory(new Callback<TableColumn, TableCell>() {
             @Override
@@ -130,6 +223,18 @@ public class InventoryViewerPage extends GridPane implements Page {
             }
         });
 
+        fourthCol.setOnEditCommit(e -> {
+            try {
+                var event = (TableColumn.CellEditEvent<Product, Price>) e;
+                Product prod = event.getTableView().getItems().get(event.getTablePosition().getRow());
+                prod.setPrice(event.getNewValue());
+                updateProduct(prod);
+            }
+            catch (Exception ex) {
+                displayError(ex);
+            }
+        });
+
         tblProducts.getColumns().addAll(
                 firstCol,
                 secondCol,
@@ -137,88 +242,42 @@ public class InventoryViewerPage extends GridPane implements Page {
                 fourthCol
         );
 
+        tblProducts.setItems(observableProducts);
         tblProducts.setEditable(true);
-
-        scrllProducts = new ScrollPane();
-        scrllProducts.setContent(tblProducts);
-        scrllProducts.fitToWidthProperty().set(true);
-        scrllProducts.fitToHeightProperty().set(true);
-
-        ColumnConstraints onlyCol = new ColumnConstraints();
-        onlyCol.setPercentWidth(100);
-
-        getColumnConstraints().add(onlyCol);
-
-        RowConstraints row1 = new RowConstraints();
-        RowConstraints row2 = new RowConstraints();
-
-        row1.setPercentHeight(20);
-        row2.setPercentHeight(80);
-
-        getRowConstraints().addAll(row1, row2);
-
-        add(vboxProdSearch, 0, 0);
-        add(scrllProducts, 0, 1);
-
-        setHalignment(vboxProdSearch, HPos.CENTER);
-        setHalignment(scrllProducts, HPos.CENTER);
-
-        // Now, you may wonder what this negative margin does. Good question. I just know it makes it less ugly
-        setMargin(vboxProdSearch, new Insets(-50));
-        setMargin(tblProducts, new Insets(-50));
-
-        search();
     }
+
+    private void updateProduct(Product pr)  {
+        try {
+            DataManager.updateProduct(pr);
+        }
+        catch (Exception ex) {
+            displayError(ex);
+        }
+    }
+
+    private void displayError(Exception ex) {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Error");
+        dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+        dialog.setContentText("The product could not be updated due to the following error:\n\n" + ex.getMessage());
+
+        dialog.showAndWait();
+    }
+
 
     private void onType() {
         search();
     }
 
     private void search() {
-        tblProducts.getItems().clear();
+        observableProducts.clear();
 
         var nameText = txtProductName.getText();
         var sizeText = txtProductSize.getText();
 
         List<Product> products = nameText.isEmpty() && sizeText.isEmpty() ? DataManager.getAllProducts() : DataManager.searchInventory(nameText, sizeText);
 
-        tblProducts.getItems().addAll(products);
-
-        //lookup product in inventory, generate grid with results
-        /*
-        grdProducts.getChildren().clear();
-
-        var nameText = txtProductName.getText();
-        var sizeText = txtProductSize.getText();
-
-        List<Product> products = null;
-
-        if (nameText.isEmpty() && sizeText.isEmpty()) {
-            products = DataManager.getAllProducts();
-        }
-        else {
-            products = DataManager.searchInventory(nameText, sizeText);
-        }
-
-        if (products == null) {
-            return; // Extra safety check, in case something goes wrong internally
-        }
-
-        int rowindex = 0;
-        for(Product prod : products) {
-            TextField txtName = new TextField(prod.getName());
-            TextField txtSize = new TextField(prod.getSize());
-            TextField txtPrice = new TextField(prod.getPrice().toString());
-            TextField txtQty = new TextField(Integer.toString(prod.getQuantity()));
-
-            grdProducts.add(txtName, 0, rowindex);
-            grdProducts.add(txtSize, 1, rowindex);
-            grdProducts.add(txtPrice, 2, rowindex);
-            grdProducts.add(txtQty, 3, rowindex);
-
-            rowindex++;
-        }
-         */
+        observableProducts.addAll(products);
     }
 
     @Override

@@ -63,7 +63,7 @@ Black            #333333;
 
 /* Checkout Task Page 2 (ItemRentPage) */
 #pageItemRent {}
-#scrllProducts {
+#scrllCheckoutProducts {
     -fx-fit-to-width: true;
 }
 #grdCheckoutProducts {
@@ -126,9 +126,5 @@ Black            #333333;
 #lblProdSize {}
 #txtProdSize {}
 
-#scrllProducts {
-    -fx-max-width: 750;
-    -fx-max-height: 1000;
-}
 
 #tblProducts {}

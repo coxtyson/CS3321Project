@@ -396,8 +396,8 @@ public class MariaDB implements Database {
         String sql = "UPDATE Products SET Name=(?), Size=(?), Quantity=(?), Price=(?), IsActive=(?), BundleOnly=(?) WHERE ID=(?)";
 
         try (var stmnt = connection.prepareStatement(sql)) {
-            stmnt.setString(1, productUpdated.getSize());
-            stmnt.setString(2, productOriginal.getName());
+            stmnt.setString(1, productUpdated.getName());
+            stmnt.setString(2, productOriginal.getSize());
             stmnt.setInt(3, productOriginal.getQuantity());
             stmnt.setDouble(4, productOriginal.getPrice().getTotal());
             stmnt.setBoolean(5, productOriginal.isActive());
