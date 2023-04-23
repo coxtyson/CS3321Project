@@ -90,15 +90,12 @@ public class SettingsPage extends BorderPane implements Page {
                         combo.setItems(toObservableList(options));
                         combo.getSelectionModel().select((String) value);
 
-                        combo.valueProperty().addListener(new ChangeListener<String>() {
-                            @Override
-                            public void changed(ObservableValue<? extends String> observableValue, String old, String newValue) {
-                                setting.set(newValue);
+                        combo.valueProperty().addListener((observableValue, old, newValue) -> {
+                            setting.set(newValue);
 
-                                if (specialActions.containsKey(setting.getName())) {
-                                    Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                    func.accept(setting);
-                                }
+                            if (specialActions.containsKey(setting.getName())) {
+                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
+                                func.accept(setting);
                             }
                         });
 
@@ -109,15 +106,12 @@ public class SettingsPage extends BorderPane implements Page {
                         combo.setItems(toObservableList(options));
                         combo.getSelectionModel().select((Integer) value);
 
-                        combo.valueProperty().addListener(new ChangeListener<Integer>() {
-                            @Override
-                            public void changed(ObservableValue<? extends Integer> observableValue, Integer old, Integer newValue) {
-                                setting.set(newValue);
+                        combo.valueProperty().addListener((observableValue, old, newValue) -> {
+                            setting.set(newValue);
 
-                                if (specialActions.containsKey(setting.getName())) {
-                                    Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                    func.accept(setting);
-                                }
+                            if (specialActions.containsKey(setting.getName())) {
+                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
+                                func.accept(setting);
                             }
                         });
 
@@ -131,15 +125,12 @@ public class SettingsPage extends BorderPane implements Page {
                     var chk = new CheckBox();
                     chk.setSelected((Boolean) value);
 
-                    chk.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                        @Override
-                        public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-                            setting.set(newValue);
+                    chk.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
+                        setting.set(newValue);
 
-                            if (specialActions.containsKey(setting.getName())) {
-                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                func.accept(setting);
-                            }
+                        if (specialActions.containsKey(setting.getName())) {
+                            Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
+                            func.accept(setting);
                         }
                     });
 
@@ -149,15 +140,12 @@ public class SettingsPage extends BorderPane implements Page {
                     var txt = new TextField();
                     txt.setText((String) value);
 
-                    txt.textProperty().addListener(new ChangeListener<String>() {
-                        @Override
-                        public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                            setting.set(newValue);
+                    txt.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                        setting.set(newValue);
 
-                            if (specialActions.containsKey(setting.getName())) {
-                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                func.accept(setting);
-                            }
+                        if (specialActions.containsKey(setting.getName())) {
+                            Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
+                            func.accept(setting);
                         }
                     });
 
@@ -168,23 +156,20 @@ public class SettingsPage extends BorderPane implements Page {
                     int number = (Integer) value;
                     txt.setText(Integer.toString(number));
 
-                    txt.textProperty().addListener(new ChangeListener<String>() {
-                        @Override
-                        public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                            Integer value = null;
+                    txt.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                        Integer value1 = null;
 
-                            try {
-                                value = Integer.parseInt(newValue);
-                            }
-                            catch (Exception ignored) {} // Don't try to update if they type something not a number
+                        try {
+                            value1 = Integer.parseInt(newValue);
+                        }
+                        catch (Exception ignored) {} // Don't try to update if they type something not a number
 
-                            if (value != null) {
-                                setting.set(value);
+                        if (value1 != null) {
+                            setting.set(value1);
 
-                                if (specialActions.containsKey(setting.getName())) {
-                                    Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                    func.accept(setting);
-                                }
+                            if (specialActions.containsKey(setting.getName())) {
+                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
+                                func.accept(setting);
                             }
                         }
                     });
