@@ -13,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.text.Font;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 
@@ -89,15 +90,7 @@ public class SettingsPage extends BorderPane implements Page {
                         var combo = new ComboBox<String>();
                         combo.setItems(toObservableList(options));
                         combo.getSelectionModel().select((String) value);
-
-                        combo.valueProperty().addListener((observableValue, old, newValue) -> {
-                            setting.set(newValue);
-
-                            if (specialActions.containsKey(setting.getName())) {
-                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                func.accept(setting);
-                            }
-                        });
+                        combo.valueProperty().addListener((observableValue, old, newValue) -> { updateSetting(setting, newValue); });
 
                         control = combo;
                     }
@@ -106,14 +99,7 @@ public class SettingsPage extends BorderPane implements Page {
                         combo.setItems(toObservableList(options));
                         combo.getSelectionModel().select((Integer) value);
 
-                        combo.valueProperty().addListener((observableValue, old, newValue) -> {
-                            setting.set(newValue);
-
-                            if (specialActions.containsKey(setting.getName())) {
-                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                func.accept(setting);
-                            }
-                        });
+                        combo.valueProperty().addListener((observableValue, old, newValue) -> { updateSetting(setting, newValue);});
 
                         control = combo;
                     }
@@ -125,14 +111,7 @@ public class SettingsPage extends BorderPane implements Page {
                     var chk = new CheckBox();
                     chk.setSelected((Boolean) value);
 
-                    chk.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
-                        setting.set(newValue);
-
-                        if (specialActions.containsKey(setting.getName())) {
-                            Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                            func.accept(setting);
-                        }
-                    });
+                    chk.selectedProperty().addListener((observableValue, oldValue, newValue) -> { updateSetting(setting, newValue); });
 
                     control = chk;
                 }
@@ -140,14 +119,7 @@ public class SettingsPage extends BorderPane implements Page {
                     var txt = new TextField();
                     txt.setText((String) value);
 
-                    txt.textProperty().addListener((observableValue, oldValue, newValue) -> {
-                        setting.set(newValue);
-
-                        if (specialActions.containsKey(setting.getName())) {
-                            Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                            func.accept(setting);
-                        }
-                    });
+                    txt.textProperty().addListener((observableValue, oldValue, newValue) -> { updateSetting(setting, newValue); });
 
                     control = txt;
                 }
@@ -165,12 +137,7 @@ public class SettingsPage extends BorderPane implements Page {
                         catch (Exception ignored) {} // Don't try to update if they type something not a number
 
                         if (value1 != null) {
-                            setting.set(value1);
-
-                            if (specialActions.containsKey(setting.getName())) {
-                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                func.accept(setting);
-                            }
+                            updateSetting(setting, newValue);
                         }
                     });
 
@@ -188,6 +155,15 @@ public class SettingsPage extends BorderPane implements Page {
             }
 
             vboxSettings.getChildren().add(box);
+        }
+    }
+
+    private void updateSetting(Setting setting, Object newValue) {
+        setting.set(newValue);
+
+        if (specialActions.containsKey(setting.getName())) {
+            Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
+            func.accept(setting);
         }
     }
 
