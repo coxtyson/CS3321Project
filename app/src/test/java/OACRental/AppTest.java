@@ -26,9 +26,15 @@ public class AppTest {
         assertEquals("123-456-7890", testCustomer.getPhone(), "Customer phone number must be accessible");
         assertEquals("Test@Test.com", testCustomer.getEmail(), "Customer email address must be accessible");
 
-        Customer C2 = new Customer("Test", "Customer", "00000", "123-456-7890", "Test@test.com");
+        Customer C2 = new Customer("Test", "Customer", "00001", "123-456-7899", "Test@test.com");
         assertFalse(C2.equals(testCustomer), "Test Customer and C2 are not the same");
         assertTrue(C2.equals(C2), "C2 and C2 are the same");
+
+        C2.setEmail("Test@Test.com");
+        C2.setID("00000");
+        C2.setPhone("123-456-7890");
+        assertTrue(C2.equals(testCustomer));
+
 
     }
 
