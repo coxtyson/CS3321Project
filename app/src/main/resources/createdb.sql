@@ -35,8 +35,20 @@ CREATE TABLE Bundles(
 CREATE TABLE Transactions(
     ID INT NOT NULL AUTO_INCREMENT,
     CustID INT NOT NULL,
-    Notes VARCHAR(10000),
     Checkout DATETIME,
     ExpectedReturn DATETIME,
+    Subtotal INT,
+    IsActive BOOL,
+    PRIMARY KEY(ID)
+);
+
+
+CREATE TABLE LineItem(
+    ID INT NOT NULL AUTO_INCREMENT,
+    CustID INT NOT NULL,
+    Checkout DATETIME,
+    ExpectedReturn DATETIME,
+    Subtotal INT,
+    IsActive BOOL,
     PRIMARY KEY(ID)
 );

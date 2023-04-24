@@ -26,4 +26,5 @@ public interface Database {
         public void addCustomer(Customer customer);
         public void addProduct(Product product);
         public void updateProduct(Product productOriginal, Product productUpdated);
+        public void addTransaction(Transaction transaction);
 }

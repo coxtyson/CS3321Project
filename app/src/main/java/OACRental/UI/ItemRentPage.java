@@ -53,7 +53,7 @@ public class ItemRentPage extends GridPane implements Page {
         vboxCart = new VBox();
         vboxCart.setId("vboxCart");
         scrllProducts = new ScrollPane();
-        scrllProducts.setId("scrllCheckoutProducts");
+        scrllProducts.setId("scrllProducts");
         scrllCart = new ScrollPane();
         scrllCart.setId("scrllCart");
 
@@ -76,7 +76,6 @@ public class ItemRentPage extends GridPane implements Page {
         btnCartClear.setOnAction(event -> {
             DataManager.clearCart();
             updateCart();
-            updateProductGrid();
         });
 
         scrllProducts.setContent(grdProducts);
@@ -140,53 +139,6 @@ public class ItemRentPage extends GridPane implements Page {
 
         grdProducts.getColumnConstraints().addAll(nameCol, sizeCol, priceCol, qtyCol, btnCol);
 
-        updateProductGrid();
-
-
-        setMargin(scrllProducts, new Insets(20, 0, 20, 20));
-        setMargin(scrllCart, new Insets(20));
-
-        // Insert the child panels into this one
-
-        add(scrllProducts, 0, 0);
-        add(grdCart, 1, 0);
-    }
-
-    private void updateCart() {
-        vboxCart.getChildren().clear();
-
-        List<Product> cart = DataManager.getCart();
-
-        Price total = new Price();
-
-        for (Product prod : cart) {
-            Label lblProduct = new Label();
-
-            if (prod.getSize() != null && !prod.getSize().isEmpty()) {
-                lblProduct.setText(prod.getName() + " - " + prod.getSize() + "\n" + prod.getPrice());
-            }
-            else {
-                lblProduct.setText(prod.getName() + "\n" + prod.getPrice());
-            }
-
-            total.add(prod.getPrice());
-
-            vboxCart.getChildren().add(lblProduct);
-        }
-
-        lblTotal.setText("Total: " + total);
-    }
-
-    private void updateProductGrid() {
-        // Realistically this should be a table view now that I made that button cell thing, it'd be easy to bind
-        // a button to the add, and the rest of the grid need not be editable. But since we're sticking with a table
-        // for now, it's worth knowing that grid lines are intended for debug only, so have some weird consequences.
-        // They're technically a child node of the grid, so if you clear the grid while the lines are on, it will
-        // permanently delete the grid lines. So you should turn them off, clear and rebuild, then turn them on
-
-        grdProducts.setGridLinesVisible(false);
-        grdProducts.getChildren().clear();
-
         grdProducts.add(new Label("Product"), 0, 0);
         grdProducts.add(new Label("Size"), 1, 0);
         grdProducts.add(new Label("Price"), 2, 0);
@@ -208,8 +160,6 @@ public class ItemRentPage extends GridPane implements Page {
                 try {
                     DataManager.addProductToCart(prod);
                     updateCart();
-
-                    lblProdQty.setText(Integer.toString(Integer.parseInt(lblProdQty.getText()) - 1));
                 }
                 catch (IllegalArgumentException ex) {
                     Dialog<String> dialog = new Dialog<>();
@@ -230,7 +180,40 @@ public class ItemRentPage extends GridPane implements Page {
             row++;
         }
 
-        grdProducts.setGridLinesVisible(true);
+        setMargin(scrllProducts, new Insets(20, 0, 20, 20));
+        setMargin(scrllCart, new Insets(20));
+
+
+
+        // Insert the child panels into this one
+
+        add(scrllProducts, 0, 0);
+        add(grdCart, 1, 0);
+    }
+
+    private void updateCart() {
+        vboxCart.getChildren().clear();
+
+        List<Product> cart = DataManager.getCart();
+
+        Price total = new Price();
+
+        for (Product prod : cart) {
+            Label lblProduct = new Label();
+
+            if (prod.getSize() != null && !prod.getSize().isEmpty()) {
+                lblProduct.setText(prod.getName() + " - " + prod.getSize() + " - " + prod.getPrice() + "\n");
+            }
+            else {
+                lblProduct.setText(prod.getName() + " - " + prod.getPrice() + "\n");
+            }
+
+            total.add(prod.getPrice());
+
+            vboxCart.getChildren().add(lblProduct);
+        }
+
+        lblTotal.setText("Total: " + total);
     }
 
     @Override
