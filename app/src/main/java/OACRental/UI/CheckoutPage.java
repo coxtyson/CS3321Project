@@ -28,6 +28,7 @@ public class CheckoutPage extends GridPane implements Page {
         this.parent = parent;
         setId("pageCheckout");
         vboxItems = new VBox();
+        vboxItems.setId("vboxItemsBought");
         vboxTransactionControls = new VBox();
         vboxTransactionControls.setId("vboxTransactionControls");
 
@@ -41,6 +42,14 @@ public class CheckoutPage extends GridPane implements Page {
         Label lblReturnDate = new Label("Return Date");
         DatePicker dateReturn = new DatePicker();
         Button btnPrint = new Button("Print Receipt");
+        Button btnSave = new Button("Save Receipt");
+
+        lblCheckoutDate.setId("lblCheckoutDate");
+        dateCheckout.setId("dateCheckout");
+        lblReturnDate.setId("lblReturnDate");
+        dateReturn.setId("dateReturn");
+        btnPrint.setId("btnPrint");
+        btnSave.setId("btnSave");
 
         checkoutDate = LocalDate.now();
         returnDate = checkoutDate.plusDays(1);
@@ -53,7 +62,7 @@ public class CheckoutPage extends GridPane implements Page {
                 dateCheckout,
                 lblReturnDate,
                 dateReturn,
-                btnPrint
+                new HBox(btnPrint, btnSave)
         );
 
         ColumnConstraints mainCol = new ColumnConstraints();
@@ -68,59 +77,11 @@ public class CheckoutPage extends GridPane implements Page {
         dateReturn.valueProperty().addListener((ov, oldValue, newValue) -> { returnDate = newValue; });
 
         btnPrint.setOnAction(event -> {
-            if(checkoutDate == null){
-                Dialog<String> dialog = new Dialog<>();
-                dialog.setTitle("Error");
-                dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
-                dialog.setContentText("Please select a checkout date");
+            printReceipt(processTransaction());
+        });
 
-                dialog.showAndWait();
-                return;
-            }
-
-            if(returnDate == null){
-                Dialog<String> dialog = new Dialog<>();
-                dialog.setTitle("Error");
-                dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
-                dialog.setContentText("Please select a return date");
-
-                dialog.showAndWait();
-                return;
-            }
-
-            Transaction transaction = new Transaction(DataManager.getActiveCustomer(), DataManager.getCart(), checkoutDate, returnDate);
-
-            Receipt receipt = new Receipt();
-            receipt.setCustomer(DataManager.getActiveCustomer());
-            receipt.setItems(DataManager.getCart());
-            receipt.setTransaction(transaction);
-
-            // commented out printing to a printer
-            /*
-            try {
-                receipt.print();
-            }
-            catch (Exception ex) {
-                Dialog<String> dialog = new Dialog<>();
-                dialog.setTitle("Error");
-                dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
-                dialog.setContentText("Printing could not be completed due to the following error: \n\n" + ex.toString());
-
-                dialog.showAndWait();
-            }
-            */
-            // saves the reciept to a pdf
-            try {
-                receipt.save("OACRecieptTest.pdf");
-            }
-            catch (Exception ex) {
-                Dialog<String> dialog = new Dialog<>();
-                dialog.setTitle("Error");
-                dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
-                dialog.setContentText("Saving could not be completed due to the following error: \n\n" + ex.toString());
-
-                dialog.showAndWait();
-            }
+        btnSave.setOnAction(event -> {
+            saveReceipt(processTransaction());
         });
     }
 
@@ -132,6 +93,73 @@ public class CheckoutPage extends GridPane implements Page {
         for (Product prod : cart) {
             Label lblProduct = new Label(prod.getPrettyName() + "\n" + prod.getPrice());
             vboxItems.getChildren().add(lblProduct);
+        }
+    }
+
+    private Receipt processTransaction() {
+        if(checkoutDate == null){
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Error");
+            dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+            dialog.setContentText("Please select a checkout date");
+
+            dialog.showAndWait();
+            return null;
+        }
+
+        if(returnDate == null){
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Error");
+            dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+            dialog.setContentText("Please select a return date");
+
+            dialog.showAndWait();
+            return null;
+        }
+
+        Transaction transaction = new Transaction(DataManager.getActiveCustomer(), DataManager.getCart(), checkoutDate, returnDate);
+
+        Receipt receipt = new Receipt();
+        receipt.setCustomer(DataManager.getActiveCustomer());
+        receipt.setItems(DataManager.getCart());
+        receipt.setTransaction(transaction);
+
+        return receipt;
+    }
+
+    private void printReceipt(Receipt receipt) {
+        if (receipt == null) {
+            return;
+        }
+
+        try {
+            receipt.print();
+        }
+        catch (Exception ex) {
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Error");
+            dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+            dialog.setContentText("Printing could not be completed due to the following error: \n\n" + ex.toString());
+
+            dialog.showAndWait();
+        }
+    }
+
+    private void saveReceipt(Receipt receipt) {
+        if (receipt == null) {
+            return;
+        }
+
+        try {
+            receipt.save("OACRecieptTest.pdf");
+        }
+        catch (Exception ex) {
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Error");
+            dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+            dialog.setContentText("Saving could not be completed due to the following error: \n\n" + ex.toString());
+
+            dialog.showAndWait();
         }
     }
 }

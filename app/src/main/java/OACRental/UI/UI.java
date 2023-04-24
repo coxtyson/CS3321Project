@@ -4,18 +4,29 @@ package OACRental.UI;
 import OACRental.DataManager;
 import OACRental.SettingsManager;
 import javafx.application.Application;
+import javafx.scene.Parent;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.Node;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 
+import java.io.File;
+import java.lang.reflect.Field;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class UI extends Application {
     ArrayList<TaskView> tasks;
     TaskView currentTask;
 
+    static Scene scene; // Static, this app only ever uses one scene
     GridPane mainpane;
 
 
@@ -75,7 +86,7 @@ public class UI extends Application {
         ColumnConstraints col1 = new ColumnConstraints();
         ColumnConstraints col2 = new ColumnConstraints();
 
-        col1.setPrefWidth(100);
+        col1.setMinWidth(100);  // This is set to min width instead of prefwidth to 100% guarantee the nav buttons are always visible
         col2.setFillWidth(true);
         col2.setHgrow(Priority.ALWAYS);
 
@@ -107,24 +118,89 @@ public class UI extends Application {
 
         try {
             DataManager.connectToDatabase(
-                    (String) SettingsManager.getSetting("database-url"),
-                    (int) SettingsManager.getSetting("database-port"),
-                    (String) SettingsManager.getSetting("database-name"),
-                    (String) SettingsManager.getSetting("database-username"),
-                    (String) SettingsManager.getSetting("database-password")
+                    (String) SettingsManager.getSettingValue("Database URL"),
+                    (int) SettingsManager.getSettingValue("Database Port"),
+                    (String) SettingsManager.getSettingValue("Database Name"),
+                    (String) SettingsManager.getSettingValue("Database Username"),
+                    (String) SettingsManager.getSettingValue("Database Password")
             );
         }
         catch (Exception ex) {
-            System.out.println("Failed initial connection to database with reason:");
-            System.out.println(ex.getMessage());
+            Dialog<String> dialog = new Dialog<>();
+            dialog.setTitle("Error");
+            dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+            dialog.setContentText("Failed to connect with the database.\nAre your database settings correct?\n\nError:\n\n" + ex.toString());
+
+            dialog.showAndWait();
         }
 
-        Scene scene = initUI();
+        scene = initUI();
 
-        scene.getStylesheets().add("style.css");
+        scene.setOnKeyReleased(event -> {
+            if (event.getCode() == KeyCode.CLOSE_BRACKET) {  // Keycode close bracket is the ']' symbol
+                this.debugDumpSceneHierarchy(scene.getRoot(), 0, null);
+            }
+        });
+
+        setStyle((String) SettingsManager.getSettingValue("Theme"));
 
         primaryStage.setScene(scene);
 
         primaryStage.show();
     }
+
+    public static void setStyle(String name) {
+        URL u = UI.class.getResource("/" + name + ".css");
+
+        if (u == null) {
+            System.out.println("Not applying style " + name + ", file not found");
+            return;
+        }
+
+
+        if (!scene.getStylesheets().isEmpty()) {
+            scene.getStylesheets().clear();
+        }
+
+        scene.getStylesheets().add(name + ".css");
+    }
+
+    private void debugDumpSceneHierarchy(Node node, int depth, List<String> hierarchy_ids) {
+        List<String> ids = null;
+
+        ids = Objects.requireNonNullElseGet(hierarchy_ids, ArrayList::new);
+
+        for (String previd : ids) {
+            if (previd.equals(node.getId())) {
+                throw new RuntimeException("Two nodes have the same id of " + previd);
+            }
+            else if (node.getId() != null) {
+                ids.add(node.getId());
+            }
+        }
+
+        StringBuilder linebuilder = new StringBuilder();
+        for (int i = 0; i < depth; i++) {
+            linebuilder.append("-");
+        }
+
+        String classname = node.getClass().getName();
+        String[] namecomps = classname.split("\\.");
+        String singlewordname = namecomps[namecomps.length - 1];
+
+        linebuilder.append(" ");
+        linebuilder.append("[").append(singlewordname).append("]");
+        linebuilder.append("[").append(node.getId()).append("]");
+
+        System.out.println(linebuilder.toString());
+
+        if (node instanceof Parent) {
+            Parent parent = (Parent) node;
+
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                debugDumpSceneHierarchy(child, depth + 1, ids);
+            }
+        }
+    }
+
 }

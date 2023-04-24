@@ -5,6 +5,7 @@ import OACRental.Price;
 import OACRental.Product;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 
@@ -52,16 +53,30 @@ public class ItemRentPage extends GridPane implements Page {
         vboxCart = new VBox();
         vboxCart.setId("vboxCart");
         scrllProducts = new ScrollPane();
-        scrllProducts.setId("scrllProducts");
+        scrllProducts.setId("scrllCheckoutProducts");
         scrllCart = new ScrollPane();
         scrllCart.setId("scrllCart");
 
         Label lblCartHeader = new Label("Cart");
+        lblCartHeader.setId("lblCartHeader");
         lblTotal = new Label("Total: $0.00");
+
         Button btnCartCheckout = new Button("Checkout");
+        Button btnCartClear = new Button("Clear Cart");
+
+        btnCartCheckout.setId("btnCartCheckout");
+        btnCartClear.setId("btnCartClear");
 
         btnCartCheckout.setOnAction(event -> {
-            parent.nextPage();
+            if (!DataManager.getCart().isEmpty()) {
+                parent.nextPage();
+            }
+        });
+
+        btnCartClear.setOnAction(event -> {
+            DataManager.clearCart();
+            updateCart();
+            updateProductGrid();
         });
 
         scrllProducts.setContent(grdProducts);
@@ -72,8 +87,23 @@ public class ItemRentPage extends GridPane implements Page {
         scrllCart.setContent(vboxCart);
         grdCart.add(lblCartHeader, 0, 0);
         grdCart.add(scrllCart, 0, 1);
-        grdCart.add(lblTotal, 0, 2);
-        grdCart.add(btnCartCheckout, 0, 3);
+
+        VBox vboxCartTotalAndControls = new VBox();
+        HBox hboxCartButtons = new HBox();
+
+        vboxCartTotalAndControls.setId("vboxCartTotalAndControls");
+        hboxCartButtons.setId("hboxCartButtons");
+
+        vboxCartTotalAndControls.setAlignment(Pos.CENTER);
+        hboxCartButtons.setAlignment(Pos.CENTER);
+
+        vboxCartTotalAndControls.getChildren().add(lblTotal);
+        vboxCartTotalAndControls.getChildren().add(hboxCartButtons);
+
+        hboxCartButtons.getChildren().add(btnCartCheckout);
+        hboxCartButtons.getChildren().add(btnCartClear);
+
+        grdCart.add(vboxCartTotalAndControls, 0, 2);
 
         GridPane.setHalignment(lblCartHeader, HPos.CENTER);
         GridPane.setHalignment(lblTotal, HPos.CENTER);
@@ -110,41 +140,11 @@ public class ItemRentPage extends GridPane implements Page {
 
         grdProducts.getColumnConstraints().addAll(nameCol, sizeCol, priceCol, qtyCol, btnCol);
 
-        grdProducts.add(new Label("Product"), 0, 0);
-        grdProducts.add(new Label("Size"), 1, 0);
-        grdProducts.add(new Label("Price"), 2, 0);
-        grdProducts.add(new Label("Qty Available"), 3, 0);
+        updateProductGrid();
 
-        int row = 1;
-        for (var prod : productList) {
-            if (!prod.isActive()) {
-                continue;
-            }
-
-            Label lblProdName = new Label(prod.getName());
-            Label lblProdSize = new Label(prod.getSize());
-            Label lblProdPrice = new Label(prod.getPrice().toString());
-            Label lblProdQty = new Label(Integer.toString(prod.getQuantity()));
-            Button btnProdAdd = new Button("Add to cart");
-
-            btnProdAdd.setOnAction(event -> {
-                DataManager.addProductToCart(prod);
-                updateCart();
-            });
-
-            grdProducts.add(lblProdName, 0, row);
-            grdProducts.add(lblProdSize, 1, row);
-            grdProducts.add(lblProdPrice, 2, row);
-            grdProducts.add(lblProdQty, 3, row);
-            grdProducts.add(btnProdAdd, 4, row);
-
-            row++;
-        }
 
         setMargin(scrllProducts, new Insets(20, 0, 20, 20));
         setMargin(scrllCart, new Insets(20));
-
-
 
         // Insert the child panels into this one
 
@@ -177,8 +177,65 @@ public class ItemRentPage extends GridPane implements Page {
         lblTotal.setText("Total: " + total);
     }
 
+    private void updateProductGrid() {
+        // Realistically this should be a table view now that I made that button cell thing, it'd be easy to bind
+        // a button to the add, and the rest of the grid need not be editable. But since we're sticking with a table
+        // for now, it's worth knowing that grid lines are intended for debug only, so have some weird consequences.
+        // They're technically a child node of the grid, so if you clear the grid while the lines are on, it will
+        // permanently delete the grid lines. So you should turn them off, clear and rebuild, then turn them on
+
+        grdProducts.setGridLinesVisible(false);
+        grdProducts.getChildren().clear();
+
+        grdProducts.add(new Label("Product"), 0, 0);
+        grdProducts.add(new Label("Size"), 1, 0);
+        grdProducts.add(new Label("Price"), 2, 0);
+        grdProducts.add(new Label("Qty Available"), 3, 0);
+
+        int row = 1;
+        for (var prod : productList) {
+            if (!prod.isActive()) {
+                continue;
+            }
+
+            Label lblProdName = new Label(prod.getName());
+            Label lblProdSize = new Label(prod.getSize());
+            Label lblProdPrice = new Label(prod.getPrice().toString());
+            Label lblProdQty = new Label(Integer.toString(prod.getQuantity()));
+            Button btnProdAdd = new Button("Add to cart");
+
+            btnProdAdd.setOnAction(event -> {
+                try {
+                    DataManager.addProductToCart(prod);
+                    updateCart();
+
+                    lblProdQty.setText(Integer.toString(Integer.parseInt(lblProdQty.getText()) - 1));
+                }
+                catch (IllegalArgumentException ex) {
+                    Dialog<String> dialog = new Dialog<>();
+                    dialog.setTitle("Error");
+                    dialog.getDialogPane().getButtonTypes().add(new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE));
+                    dialog.setContentText(ex.getMessage());
+
+                    dialog.showAndWait();
+                }
+            });
+
+            grdProducts.add(lblProdName, 0, row);
+            grdProducts.add(lblProdSize, 1, row);
+            grdProducts.add(lblProdPrice, 2, row);
+            grdProducts.add(lblProdQty, 3, row);
+            grdProducts.add(btnProdAdd, 4, row);
+
+            row++;
+        }
+
+        grdProducts.setGridLinesVisible(true);
+    }
+
     @Override
     public void update() {
+        DataManager.clearCart();
         updateCart();
     }
 }

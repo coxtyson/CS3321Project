@@ -39,7 +39,7 @@ public class DataManager {
      * @param username the name of the database user to connect with
      * @param password the user's password
      */
-    public static void connectToDatabase(String url, int port, String databaseName, String username, String password) {
+    public static void connectToDatabase(String url, int port, String databaseName, String username, String password) throws Exception {
         if (database != null && database.isConnected()) {
             database.close();
         }
@@ -73,26 +73,43 @@ public class DataManager {
 
         return cart;
     }
-    public static void addProductToCart(Product product) {
-        if (cart == null) {
-            cart = new ArrayList<>();
-        }
 
-        cart.add(product);
+    public static void clearCart() {
+        if (cart != null) {
+            cart.clear();
+        }
     }
-    public static void clearActiveTransaction() {
+
+    public static void addProductToCart(Product product) throws IllegalArgumentException {
         if (cart == null) {
             cart = new ArrayList<>();
         }
 
-        cart.clear();
+        int qty = 0;
+        for (Product prod : cart) {
+            if (prod.equals(product)) {
+                qty += 1;
+            }
+        }
+
+        if (qty < product.getQuantity()) {
+            cart.add(product);
+        }
+        else {
+            throw new IllegalArgumentException("Can't put more in cart than there is quanity in stock!");
+        }
+
     }
 
     public static List<Customer> searchCustomers(String first, String last, String phone, String id, String email, boolean fuzzy) {
-        return database.retrieveCustomers(first, last, phone, id, email, fuzzy);
+        return database == null ? new ArrayList<>() : database.retrieveCustomers(first, last, phone, id, email, fuzzy);
     }
 
     public static void createCustomer(String first, String last, String ID, String phone, String email) {
+        if (database == null) {
+            return;
+        }
+
         if(database.retrieveCustomer(first, last, ID, phone, email) == null){
             Customer newCustomer = new Customer(first, last, ID, phone, email);
             setActiveCustomer(newCustomer);
@@ -115,7 +132,7 @@ public class DataManager {
     }
 
     public static List<Product> getAllProducts() {
-        return database.getAllProducts();
+        return database == null ? new ArrayList<>() : database.getAllProducts();
     }
 
     public static List<TransactionRecord> getTransactionRecords(Customer customer){
@@ -130,13 +147,10 @@ public class DataManager {
     }
 
     public static List<Product> searchInventory(String name, String size) {
-        if(size == null || size.isEmpty()) {
-            return database.retrieveAllProductsWithName(name);
-        }
-        else{
-            ArrayList<Product> products = new ArrayList<Product>();
-            products.add(database.retrieveProduct(name, size));
-            return products;
-        }
+        return database.searchProducts(name, size, true);
+    }
+
+    public static void updateProduct(Product p) {
+        database.updateProduct(p, p); // It's sorta stupid that this takes two parameters, but this should work from where I call it lol
     }
 }

@@ -1,18 +1,20 @@
 package OACRental;
 
-import javax.swing.plaf.nimbus.State;
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MariaDB implements Database {
     private static final int timeoutSeconds = 5;
     private Connection connection;
 
-    public MariaDB(String url, int port, String databaseName, String username, String password) {
+    public MariaDB(String url, int port, String databaseName, String username, String password) throws Exception {
         try {
             Class.forName("org.mariadb.jdbc.Driver");
 
@@ -21,72 +23,54 @@ public class MariaDB implements Database {
             connection = DriverManager.getConnection(path, username, password);
 
             if (connection == null || !connection.isValid(timeoutSeconds)) {
-                throw new Exception("MariaDB connection failed");
+                throw new Exception("MariaDB connection failed for unknown reason");
             }
         }
         catch (Exception ex) {
-            System.out.println("Mariadb connection failed with reason:");
-            System.out.println(ex.getMessage());
-            // If Mariadb doesn't contain an OAC database this if statement creates a OAC database
-            if(ex.getMessage().contains("Unknown database")){
-                connection = null;
-                System.out.println("random string");
 
-                try{
+            // If Mariadb doesn't contain an OAC database this if statement creates a OAC database
+            if(ex.getMessage().contains("Unknown database")) {
+                try {
                     String newPath = "jdbc:mysql://" + url + ":" + port;
                     connection = DriverManager.getConnection(newPath, username, password);
-                    // creating the new database
-                    String createDatabase = "CREATE DATABASE ";
-                    String newDatabaseName = "OAC";
-                    Statement stmnt = connection.createStatement();
-                    stmnt.executeUpdate(createDatabase + " " + newDatabaseName);
+                    connection.prepareStatement("CREATE DATABASE OAC").executeUpdate();
                     connection.close();
-                    connection = DriverManager.getConnection(newPath + "/" + newDatabaseName, username, password);
-                    stmnt = connection.createStatement();
-                    // creating the customers table
-                    String createCustTable = "CREATE TABLE Customers(ID INTEGER NOT NULL AUTO_INCREMENT," +
-                            " FirstName VARCHAR(1000)," +
-                            " Identification VARCHAR(1000) NOT NULL," +
-                            " Phone VARCHAR(1000)," +
-                            " Email VARCHAR(1000)," +
-                            " PRIMARY KEY (ID));";
-                    stmnt.executeUpdate(createCustTable);
 
-                    // creating the products table
-                    String createProductTable = "CREATE TABLE Products(" +
-                            "ID INTEGER NOT NULL AUTO_INCREMENT," +
-                            " Name VARCHAR(1000)," +
-                            " Size VARCHAR(1000)," +
-                            " Quantity INTEGER," +
-                            " Price DOUBLE," +
-                            " IsActive BOOL," +
-                            " BundleOnly BOOL," +
-                            " PRIMARY KEY(ID));";
-                    stmnt.executeUpdate(createProductTable);
+                    // Read file contents to string
+                    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+                    InputStream is = classloader.getResourceAsStream("createdb.sql");
+                    String sqlFileContents = new BufferedReader(new InputStreamReader(is)).lines().parallel().collect(Collectors.joining("\n"));
 
-                    // creates Bundles table
-                    String createBundleTable = "CREATE TABLE Bundles(ID INTEGER NOT NULL AUTO_INCREMENT," +
-                            " Name VARCHAR(1000) NOT NULL," +
-                            " Products VARCHAR(1000)," +
-                            " PRIMARY KEY(ID));";
-                    stmnt.executeUpdate(createBundleTable);
+                    // Break file contents into individual statements, including empty statements and comments
+                    String[] fileParts = sqlFileContents.split("\\n\\n");
 
-                    // creates Transactions table
-                    String createTransactionsTable = "CREATE TABLE Transactions(" +
-                            "ID INT NOT NULL AUTO_INCREMENT," +
-                            " CustID INT NOT NULL," +
-                            " Notes VARCHAR(10000)," +
-                            " Checkout DATETIME," +
-                            " ExpectedReturn DATETIME," +
-                            " PRIMARY KEY(ID));";
-                    stmnt.executeUpdate(createTransactionsTable);
+                    List<String> statements = new ArrayList<>();
+
+                    // Strip out comments and empty lines
+                    for (String line : fileParts) {
+                        String trimmed = line.trim();
+
+                        if (!trimmed.startsWith("--") && !trimmed.isEmpty()) {
+                            statements.add(trimmed);
+                        }
+                    }
+
+                    connection = DriverManager.getConnection(newPath + "/" + "OAC", username, password);
+
+                    // Execute all the valid statements
+                    for (String sql : statements) {
+                        connection.prepareStatement(sql).executeUpdate();
+                    }
                 }
 
-                catch (Exception newEx){
-                    System.out.println("Mariadb connection failed with reason:");
-                    System.out.println(newEx.getMessage());
+                catch (Exception newEx) {
+                    throw new Exception("Failed to create OAC database. Is your SQL laid out correctly?\n\nOriginal Err:\n" + newEx.getMessage());
                 }
 
+            }
+            else {
+                // Rethrow so the UI can catch
+                throw ex;
             }
         }
 
@@ -120,7 +104,14 @@ public class MariaDB implements Database {
 
     @Override
     public Customer retrieveCustomer(String firstName, String lastName, String Phone, String ID, String email) {
-        return null;
+        var custs = this.retrieveCustomers(firstName, lastName, Phone, ID, email, false);
+
+        if (!custs.isEmpty()) {
+            return custs.get(0);
+        }
+        else {
+            return null;
+        }
     }
 
     /**
@@ -278,7 +269,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                return new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive);
+                return new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive, prodid);
             }
             else {
                 throw new Exception("No product with the name " + name);
@@ -292,7 +283,6 @@ public class MariaDB implements Database {
     @Override
     public Product retrieveProduct(String name, String size)
     {
-        /*
         if (name == null || name.isEmpty()) {
             return null;
         }
@@ -313,7 +303,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                Product prod = new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly);
+                Product prod = new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive);
                 return prod;
             }
             else {
@@ -324,8 +314,6 @@ public class MariaDB implements Database {
             System.out.println(ex.toString());
             return null;
         }
-        */
-        return null;
     }
     @Override
     public List<Product> retrieveAllProductsWithName(String name) {
@@ -381,11 +369,47 @@ public class MariaDB implements Database {
     @Override
     public void addProduct(Product product) {
         String sql = "INSERT INTO Products (Name, Size, Quantity, Price, IsActive, BundleOnly) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmnt = connection.prepareStatement(sql)) {
+            stmnt.setString(1, product.getName());
+            stmnt.setString(2, product.getSize());
+            stmnt.setInt(3, product.getQuantity());
+            stmnt.setDouble(4, product.getPrice().getTotal());
+            stmnt.setBoolean(5, product.isActive());
+            stmnt.setBoolean(6, product.isBundleOnly());
+
+            stmnt.executeUpdate();
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
     }
 
     @Override
     public void updateProduct(Product productOriginal, Product productUpdated) {
+        int id = productOriginal.getDatabaseID();
 
+        if (id == -1) {
+            throw new IllegalArgumentException("Original product not in database, make sure to use an object produced by a database call");
+        }
+
+        String sql = "UPDATE Products SET Name=(?), Size=(?), Quantity=(?), Price=(?), IsActive=(?), BundleOnly=(?) WHERE ID=(?)";
+
+        try (var stmnt = connection.prepareStatement(sql)) {
+            stmnt.setString(1, productUpdated.getName());
+            stmnt.setString(2, productOriginal.getSize());
+            stmnt.setInt(3, productOriginal.getQuantity());
+            stmnt.setDouble(4, productOriginal.getPrice().getTotal());
+            stmnt.setBoolean(5, productOriginal.isActive());
+            stmnt.setBoolean(6, productOriginal.isBundleOnly());
+
+            stmnt.setInt(7, id);
+
+            stmnt.executeUpdate();
+        }
+        catch (Exception ex) {
+            System.out.println(ex.toString());
+        }
     }
 
     @Override
@@ -416,7 +440,7 @@ public class MariaDB implements Database {
                 boolean prodIsActive = results.getBoolean(6);
                 boolean prodBundleOnly = results.getBoolean(7);
 
-                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive));
+                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive, prodid));
             }
         }
         catch (Exception ex) {
@@ -426,5 +450,59 @@ public class MariaDB implements Database {
         }
 
         return prods;
+    }
+
+    @Override
+    public List<Product> searchProducts(String name, String size, boolean fuzzy) {
+        if ((name == null || name.isEmpty()) && (size == null || size.isEmpty())) {
+            return this.getAllProducts();
+        }
+
+        // With these methods that have the boolean "fuzzy" toggle, right now it's ignored and it always fuzzy searches,
+        // but to enable it, you'd just make it so if fuzzy is false, it doesn't append the % signs when building the statement
+
+        String sql = "SELECT * FROM Products WHERE ";
+        List<String> parameters = new ArrayList<>();
+
+        if (name != null && !name.isEmpty()) {
+            sql += " Name LIKE (?)";
+            parameters.add(name.trim());
+        }
+
+        if (size != null && !size.isEmpty()) {
+            if (!parameters.isEmpty()) {
+                sql += " AND";
+            }
+
+            sql += "Size LIKE (?)";
+            parameters.add(size.trim());
+        }
+
+        try (var stmnt = connection.prepareStatement(sql)) {
+            for(int i = 0; i < parameters.size(); i++) {
+                stmnt.setString(i  + 1, "%" + parameters.get(i) + "%");
+            }
+
+            ResultSet results = stmnt.executeQuery();
+
+            ArrayList<Product> prods = new ArrayList<>();
+
+            while(results.next()) {
+                int prodid = results.getInt(1);
+                String prodName = results.getString(2);
+                String prodSize = results.getString(3);
+                int prodQuant = results.getInt(4);
+                double prodPrice = results.getDouble(5);
+                boolean prodIsActive = results.getBoolean(6);
+                boolean prodBundleOnly = results.getBoolean(7);
+
+                prods.add(new Product(prodName, prodSize, prodQuant, new Price(prodPrice), prodBundleOnly, prodIsActive, prodid));
+            }
+
+            return prods;
+        }
+        catch (Exception ex) {
+            return new ArrayList<>();
+        }
     }
 }
