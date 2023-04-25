@@ -152,4 +152,8 @@ public class DataManager {
     public static void addTransaction(Transaction transaction){
         database.addTransaction(transaction);
     }
+
+    public static void updateProduct(Product product) {
+        database.updateProduct(product, product); // Little silly to pass two of the same like this, but it should work
+    }
 }

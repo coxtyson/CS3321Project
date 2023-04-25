@@ -1,5 +1,7 @@
 package OACRental;
 
+import java.util.Objects;
+
 public class Product {
     private int databaseID;
     private String name;
@@ -59,6 +61,35 @@ public class Product {
 
     public Price getPrice(){
         return this.price;
+    }
+
+    public void setName(String name) {
+        if (name == null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name may not be empty");
+        }
+
+        this.name = name;
+    }
+
+    public void setSize(String size) {
+        if (size == null) {
+            this.size = "";
+        }
+        else {
+            this.size = size;
+        }
+    }
+
+    public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Can't have less than 0 quantity");
+        }
+
+        this.quantity = quantity;
+    }
+
+    public void setPrice(Price price) {
+        this.price = Objects.requireNonNullElseGet(price, Price::new);
     }
 
     public boolean isBundle() {

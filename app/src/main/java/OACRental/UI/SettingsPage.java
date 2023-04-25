@@ -2,8 +2,6 @@ package OACRental.UI;
 
 import OACRental.Setting;
 import OACRental.SettingsManager;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.BorderPane;
@@ -13,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.text.Font;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 
@@ -23,22 +20,17 @@ public class SettingsPage extends BorderPane implements Page {
     VBox vboxSettings;
     ScrollPane scrllMain;
 
-    Map specialActions;
+    Map<String, Consumer<Setting>> specialActions;
 
     public SettingsPage() {
         setId("pageSettings");
 
-        specialActions = new HashMap<String, Consumer<Setting>>();
+        specialActions = new HashMap<>();
 
         // Special actions are just functions that are called when the setting with the
         // given name is changed. So in this case, I just make it so when the "Theme"
         // combo box is changed, it updates the theme in real time
-        specialActions.put("Theme", new Consumer<Setting>() {
-            @Override
-            public void accept(Setting setting) {
-                UI.setStyle((String) setting.get());
-            }
-        });
+        specialActions.put("Theme", setting -> UI.setStyle((String) setting.get()));
 
         scrllMain = new ScrollPane();
         scrllMain.setId("scrllSettings");
