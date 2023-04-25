@@ -4,6 +4,7 @@ import com.sun.jdi.event.StepEvent;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import javax.xml.crypto.Data;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
@@ -215,13 +216,16 @@ public class Setting {
 
 
     private boolean typeMatches(Object value) {
-        switch (type) {
-            case BOOLEAN -> { return (value instanceof Boolean); }
-            case STRING -> { return (value instanceof String); }
-            case INTEGER -> { return (value instanceof Integer || value instanceof Long); }
+        if (type == DataType.BOOLEAN) {
+            return value instanceof Boolean;
+        } else if (type == DataType.STRING) {
+            return value instanceof String;
+        } else if (type == DataType.INTEGER) {
+            return value instanceof Integer || value instanceof Long;
         }
-
-        throw new IllegalStateException("type is not set, this should not happen");
+        else {
+            throw new IllegalStateException("Type is not set, this should not happen");
+        }
     }
 
     private boolean allowedValue(Object value) {
