@@ -130,20 +130,23 @@ public class Setting {
             return false;
         }
 
-        switch (type) {
-            case BOOLEAN -> { return ((Boolean)value) == ((Boolean)obj); }
-            case STRING -> { return ((String)value).equals(obj); }
-            case INTEGER -> {
-                if (obj instanceof Long) {
-                    return ((Integer)value) == Math.toIntExact((Long)obj);
-                }
-                else {
-                    return Objects.equals((Integer) value, (Integer) obj);
-                }
+        if (type == DataType.BOOLEAN) {
+            return ((Boolean)value) == ((Boolean)obj);
+        }
+        else if (type == DataType.STRING) {
+            return ((String)value).equals(obj);
+        }
+        else if (type == DataType.INTEGER) {
+            if (obj instanceof Long) {
+                return ((Integer)value) == Math.toIntExact((Long)obj);
+            }
+            else {
+                return Objects.equals((Integer) value, (Integer) obj);
             }
         }
-
-        throw new IllegalStateException("type is not set, this should not happen");
+        else {
+            throw new IllegalStateException("type is not set, this should not happen");
+        }
     }
 
     public JSONObject toJSONObject() {
