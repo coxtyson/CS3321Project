@@ -170,7 +170,7 @@ public class AppTest {
     @Test
     public void testTransactionRecord()
     {
-        //Test transaction code to generate a transaction
+        // code to generate a transaction
         Price price = new Price(11.11);
         Customer testCustomer = new Customer("Test", "Customer", "00000", "123-456-7890", "Test@Test.com");
         Product testProduct1 = new Product("Test","Small", 10, price, false, false);
@@ -201,6 +201,32 @@ public class AppTest {
     @Test
     public void testMariaDB()
     {
+
+
+    }
+
+    @Test
+    public void testDataManager()
+    {
+        Price price = new Price(11.11);
+        Customer testCustomer = new Customer("Test", "Customer", "00000", "123-456-7890", "Test@Test.com");
+        Product testProduct1 = new Product("Test","Small", 10, price, false, false);
+        Product testProduct2 = new Product("Test2", 5, price, true, false);
+        Product testProduct3 = new Product("TestBundle", "Item1,Item2,Item3", price, true);
+        ArrayList<Product> testProducts = new ArrayList<Product>();
+        testProducts.add(testProduct1);
+        testProducts.add(testProduct2);
+        testProducts.add(testProduct3);
+        LocalDate checkoutDate = LocalDate.of(2023, 3, 29);
+        LocalDate returnDate = LocalDate.of(2023, 4, 2);
+        Transaction testTransaction = new Transaction(testCustomer, testProducts, checkoutDate, returnDate);
+
+        LocalDateTime time = LocalDateTime.of(2023, 3, 4, 9, 5, 35);
+        TransactionRecord testTR = new TransactionRecord("Pretty cool dude",testTransaction, time, (long)895);
+
+        /* Testing DataManager class*/
+        DataManager.addProductToCart(testProduct1);
+        DataManager.addProductToCart("Test");
 
 
     }
