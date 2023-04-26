@@ -367,6 +367,48 @@ public class MariaDB implements Database {
     }
 
     @Override
+    public void addTransaction(Transaction transaction){
+        String insertTransactions = "INSERT INTO Transactions(CustID, Checkout, ExpectedReturn, Subtotal, IsActive) VALUES (?, ?, ?, ?, ?)";
+        try(PreparedStatement stmnt = connection.prepareStatement(insertTransactions)){
+            stmnt.setString(1, transaction.getCustomer().getID());
+            stmnt.setObject(2, transaction.getCheckout());
+            stmnt.setObject(3, transaction.getExpectedReturn());
+            stmnt.setDouble(4, transaction.getTotalPrice().getTotal());
+            stmnt.setBoolean(5, true);
+            stmnt.executeUpdate();
+        }
+        catch (Exception ex){
+            System.out.println(ex.toString());
+        }
+        
+        int LastInsertID = 0;
+        String getLastInsertID = "SELECT * FROM Transactions WHERE ID = LAST_INSERT_ID()";
+        try(PreparedStatement stmnt = connection.prepareStatement(getLastInsertID)){
+            ResultSet LastInsertIDResult = stmnt.executeQuery();
+            if(LastInsertIDResult.first()){
+                LastInsertID = LastInsertIDResult.getInt(1);
+            }
+        }
+        catch (Exception ex){
+            System.out.println(ex.toString());
+        }
+
+        for(int i = 0; i < transaction.getProducts().size(); i++){
+            String insertLineItem = "INSERT INTO LineItem(TransactionID, Name, Size, Price) VALUES (?, ?, ?, ?)";
+            try(PreparedStatement stmnt = connection.prepareStatement(insertLineItem)){
+                stmnt.setInt(1, LastInsertID);
+                stmnt.setString(2, transaction.getProducts().get(i).getName());
+                stmnt.setString(3, transaction.getProducts().get(i).getSize());
+                stmnt.setDouble(4, transaction.getProducts().get(i).getPrice().getTotal());
+                stmnt.executeUpdate();
+            }
+            catch (Exception ex){
+                System.out.println(ex.toString());
+            }
+        }
+    }
+
+    @Override
     public void addProduct(Product product) {
         String sql = "INSERT INTO Products (Name, Size, Quantity, Price, IsActive, BundleOnly) VALUES (?, ?, ?, ?, ?, ?)";
 

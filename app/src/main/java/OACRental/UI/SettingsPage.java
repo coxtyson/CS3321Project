@@ -2,8 +2,6 @@ package OACRental.UI;
 
 import OACRental.Setting;
 import OACRental.SettingsManager;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.BorderPane;
@@ -22,22 +20,17 @@ public class SettingsPage extends BorderPane implements Page {
     VBox vboxSettings;
     ScrollPane scrllMain;
 
-    Map specialActions;
+    Map<String, Consumer<Setting>> specialActions;
 
     public SettingsPage() {
         setId("pageSettings");
 
-        specialActions = new HashMap<String, Consumer<Setting>>();
+        specialActions = new HashMap<>();
 
         // Special actions are just functions that are called when the setting with the
         // given name is changed. So in this case, I just make it so when the "Theme"
         // combo box is changed, it updates the theme in real time
-        specialActions.put("Theme", new Consumer<Setting>() {
-            @Override
-            public void accept(Setting setting) {
-                UI.setStyle((String) setting.get());
-            }
-        });
+        specialActions.put("Theme", setting -> UI.setStyle((String) setting.get()));
 
         scrllMain = new ScrollPane();
         scrllMain.setId("scrllSettings");
@@ -89,18 +82,7 @@ public class SettingsPage extends BorderPane implements Page {
                         var combo = new ComboBox<String>();
                         combo.setItems(toObservableList(options));
                         combo.getSelectionModel().select((String) value);
-
-                        combo.valueProperty().addListener(new ChangeListener<String>() {
-                            @Override
-                            public void changed(ObservableValue<? extends String> observableValue, String old, String newValue) {
-                                setting.set(newValue);
-
-                                if (specialActions.containsKey(setting.getName())) {
-                                    Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                    func.accept(setting);
-                                }
-                            }
-                        });
+                        combo.valueProperty().addListener((observableValue, old, newValue) -> { updateSetting(setting, newValue); });
 
                         control = combo;
                     }
@@ -109,17 +91,7 @@ public class SettingsPage extends BorderPane implements Page {
                         combo.setItems(toObservableList(options));
                         combo.getSelectionModel().select((Integer) value);
 
-                        combo.valueProperty().addListener(new ChangeListener<Integer>() {
-                            @Override
-                            public void changed(ObservableValue<? extends Integer> observableValue, Integer old, Integer newValue) {
-                                setting.set(newValue);
-
-                                if (specialActions.containsKey(setting.getName())) {
-                                    Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                    func.accept(setting);
-                                }
-                            }
-                        });
+                        combo.valueProperty().addListener((observableValue, old, newValue) -> { updateSetting(setting, newValue);});
 
                         control = combo;
                     }
@@ -131,17 +103,7 @@ public class SettingsPage extends BorderPane implements Page {
                     var chk = new CheckBox();
                     chk.setSelected((Boolean) value);
 
-                    chk.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                        @Override
-                        public void changed(ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) {
-                            setting.set(newValue);
-
-                            if (specialActions.containsKey(setting.getName())) {
-                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                func.accept(setting);
-                            }
-                        }
-                    });
+                    chk.selectedProperty().addListener((observableValue, oldValue, newValue) -> { updateSetting(setting, newValue); });
 
                     control = chk;
                 }
@@ -149,17 +111,7 @@ public class SettingsPage extends BorderPane implements Page {
                     var txt = new TextField();
                     txt.setText((String) value);
 
-                    txt.textProperty().addListener(new ChangeListener<String>() {
-                        @Override
-                        public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                            setting.set(newValue);
-
-                            if (specialActions.containsKey(setting.getName())) {
-                                Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                func.accept(setting);
-                            }
-                        }
-                    });
+                    txt.textProperty().addListener((observableValue, oldValue, newValue) -> { updateSetting(setting, newValue); });
 
                     control = txt;
                 }
@@ -168,24 +120,16 @@ public class SettingsPage extends BorderPane implements Page {
                     int number = (Integer) value;
                     txt.setText(Integer.toString(number));
 
-                    txt.textProperty().addListener(new ChangeListener<String>() {
-                        @Override
-                        public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
-                            Integer value = null;
+                    txt.textProperty().addListener((observableValue, oldValue, newValue) -> {
+                        Integer value1 = null;
 
-                            try {
-                                value = Integer.parseInt(newValue);
-                            }
-                            catch (Exception ignored) {} // Don't try to update if they type something not a number
+                        try {
+                            value1 = Integer.parseInt(newValue);
+                        }
+                        catch (Exception ignored) {} // Don't try to update if they type something not a number
 
-                            if (value != null) {
-                                setting.set(value);
-
-                                if (specialActions.containsKey(setting.getName())) {
-                                    Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
-                                    func.accept(setting);
-                                }
-                            }
+                        if (value1 != null) {
+                            updateSetting(setting, newValue);
                         }
                     });
 
@@ -203,6 +147,15 @@ public class SettingsPage extends BorderPane implements Page {
             }
 
             vboxSettings.getChildren().add(box);
+        }
+    }
+
+    private void updateSetting(Setting setting, Object newValue) {
+        setting.set(newValue);
+
+        if (specialActions.containsKey(setting.getName())) {
+            Consumer<Setting> func = (Consumer<Setting>) specialActions.get(setting.getName());
+            func.accept(setting);
         }
     }
 

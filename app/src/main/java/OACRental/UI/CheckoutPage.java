@@ -1,9 +1,6 @@
 package OACRental.UI;
 
-import OACRental.DataManager;
-import OACRental.Product;
-import OACRental.Receipt;
-import OACRental.Transaction;
+import OACRental.*;
 import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.scene.Scene;
@@ -91,7 +88,7 @@ public class CheckoutPage extends GridPane implements Page {
         vboxItems.getChildren().clear();
 
         for (Product prod : cart) {
-            Label lblProduct = new Label(prod.getPrettyName() + "\n" + prod.getPrice());
+            Label lblProduct = new Label(prod.getPrettyName() + " - " + prod.getPrice() + "\n");
             vboxItems.getChildren().add(lblProduct);
         }
     }
@@ -150,6 +147,7 @@ public class CheckoutPage extends GridPane implements Page {
             return;
         }
 
+        DataManager.addTransaction(receipt.getTransaction());
         try {
             receipt.save("OACRecieptTest.pdf");
         }

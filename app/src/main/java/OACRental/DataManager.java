@@ -149,8 +149,11 @@ public class DataManager {
     public static List<Product> searchInventory(String name, String size) {
         return database.searchProducts(name, size, true);
     }
+    public static void addTransaction(Transaction transaction){
+        database.addTransaction(transaction);
+    }
 
-    public static void updateProduct(Product p) {
-        database.updateProduct(p, p); // It's sorta stupid that this takes two parameters, but this should work from where I call it lol
+    public static void updateProduct(Product product) {
+        database.updateProduct(product, product); // Little silly to pass two of the same like this, but it should work
     }
 }

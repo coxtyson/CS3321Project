@@ -46,6 +46,10 @@ public class Receipt {
         this.transaction = transaction;
     }
 
+    public Transaction getTransaction(){
+        return transaction;
+    }
+
     public void print() throws Exception {
         generatePages();
 
