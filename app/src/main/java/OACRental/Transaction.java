@@ -1,46 +1,58 @@
 package OACRental;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Calendar;
 public class Transaction {
     private Customer customer;
     private int discountPercentage;
-    private List<Bundle> bundles;
-    private List<LineItem> lineItems;
-    private Date checkout;
-    private Date expectedReturn;
+    private List<Product> products;
+    private LocalDate checkout;
+    private LocalDate expectedReturn;
 
-    public Transaction(Customer customer, List<Bundle> bundles, List<LineItem> lineItems, Date checkout,
-                       Date expectedReturn, int discountPercentage)
+    public Transaction(Customer customer,List<Product> products, LocalDate checkout,
+                       LocalDate expectedReturn, int discountPercentage)
     {
         this.customer = customer;
-        this.bundles = bundles;
-        this.lineItems = lineItems;
+        this.products = products;
         this.checkout = checkout;
         this.expectedReturn = expectedReturn;
         this.discountPercentage = discountPercentage;
     }
 
-    public Transaction(Customer customer, List<Bundle> bundles, List<LineItem> lineItems, Date checkout, Date expectedReturn){
-        this(customer, bundles, lineItems, checkout, expectedReturn, 0);
+    public Transaction(Customer customer, List<Product> products, LocalDate checkout, LocalDate expectedReturn){
+        this(customer, products, checkout, expectedReturn, 0);
     }
 
     public Customer getCustomer(){
         return this.customer;
     }
-    public int getDiscount(){
+    public int getDiscountPercentage(){
         return this.discountPercentage;
     }
-    public Date getCheckout(){
+
+    public LocalDate getCheckout(){
         return this.checkout;
     }
-    public Date getExpectedReturn(){
+    public LocalDate getExpectedReturn(){
+
         return this.expectedReturn;
     }
-    public List<Bundle> getBundles(){
-        return this.bundles;
+    public List<Product> getProducts(){
+        return this.products;
     }
-    public List<LineItem> getLineItems(){
-        return this.lineItems;
+
+    public Price getTotalPrice() {
+        Price totalPrice = new Price(); //$00.00
+
+        //add the prices for every item in the cart
+        for(Product p : this.products) {
+            totalPrice.add(p.getPrice());
+        }
+        if(this.discountPercentage > 0) {
+            //convert percent to decimal value
+            double discountDecimal = this.discountPercentage / (double)100;
+            totalPrice.multiply((1-discountDecimal));
+        }
+
+        return totalPrice;
     }
 }

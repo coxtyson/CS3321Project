@@ -3,11 +3,12 @@
  */
 package OACRental;
 
+import OACRental.UI.UI;
 import javafx.application.Application;
 
 public class App {
     public static void main(String[] args) {
-        UI userinterface = new UI();
-        Application.launch(userinterface.getClass());
+        UI userInterface = new UI();
+        Application.launch(userInterface.getClass());
     }
 }

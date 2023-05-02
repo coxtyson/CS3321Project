@@ -1,0 +1,130 @@
+/* ISU official colors */
+/*
+Roarange         #f47920
+Light Roarange   #f69240
+Buttons          #d4441c;
+Links            #b82b00;
+White            #fff;
+Gray Background: #f1f1f1;
+Borders          #e6e7e8;
+Dark             #424242;
+Black            #333333;
+ */
+
+/* This section of style code controls theming related to the whole application */
+.root {
+    -fx-accent: #f69240;
+    -fx-focus-color: #f69240;
+    -fx-default-button: #d4441c;
+}
+
+/* These are the panels that contain the app frame and the navigation buttons visible everywhere, such as tasks and the back button  */
+
+#grdMain {
+    -fx-background-color: #f1f1f1;
+}
+#hboxMainNavButtons {}
+#btnNavBack {}
+#vboxMainTaskButtons {}
+#btnTaskCheckout {}
+#btnTaskSettings {}
+#btnTaskInventory {}
+
+/* These are the the controls for the checkout task page 1 (CustomerAddPage)*/
+/* Note that pageCustomer is a GridPane */
+#pageCustomer {
+    -fx-padding: 50;
+}
+#vboxEntryFields {
+    -fx-spacing: 50; /* Space out the fields so they're not just scrunched together */
+    -fx-max-width: 1000;
+}
+#vboxFirstName {}
+#lblFirstName {}
+#txtFirstName {}
+#vboxLastName {}
+#lblLastName {}
+#txtLastName {}
+#vboxID {}
+#lblID {}
+#txtID {}
+#vboxPhone {}
+#lblPhone {}
+#txtPhone {}
+#vboxEmail {}
+#lblEmail {}
+#txtEmail {}
+#btnAddCustomer {}
+#scrllFoundCustomers {
+    -fx-min-width: 50;
+}
+#lstCustomers {} /* Keep in mind, lstCustomers is contained in scrllFoundCustomers, which will resize it */
+
+
+/* Checkout Task Page 2 (ItemRentPage) */
+#pageItemRent {}
+#scrllCheckoutProducts {
+    -fx-fit-to-width: true;
+}
+#grdCheckoutProducts {
+    -fx-grid-lines-visible: true;
+}
+#grdCart {}
+#lblCartHeader {}
+#vboxCart {}
+#scrllCart {
+    -fx-fit-to-width: true;
+}
+#vboxCartTotalAndControls {}
+#hboxCartButtons {
+    -fx-spacing: 10;
+}
+
+/* Checkout Task Page 3 (Checkout Task) */
+#pageCheckout {
+    -fx-padding: 25;
+}
+
+#vboxItemsBought {}
+#vboxTransactionControls {
+    -fx-spacing: 20;
+}
+#lblCheckoutDate {}
+#dateCheckout {}
+#lblReturnDate {}
+#dateReturn {}
+#btnPrint {}
+#btnSave {}
+
+
+
+
+
+
+
+
+
+
+/* Inventory viewer task/page controls */
+
+
+#pageInventory {
+    -fx-padding: 25;
+}
+
+#vboxProdSearch {
+    -fx-spacing: 20;
+    -fx-padding: 25;
+    -fx-max-width: 500;
+}
+
+#vboxProdName {}
+#lblProdName {}
+#txtProdName {}
+
+#vboxProdSize {}
+#lblProdSize {}
+#txtProdSize {}
+
+
+#tblProducts {}
