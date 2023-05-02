@@ -198,12 +198,6 @@ public class AppTest {
         assertEquals("Blurb", testTR.getNotes(), "Must be able to modify transaction notes");
 
     }
-    @Test
-    public void testMariaDB()
-    {
-
-
-    }
 
     @Test
     public void testDataManager()
