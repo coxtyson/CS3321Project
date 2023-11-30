@@ -102,11 +102,6 @@ public class Price {
         }
     }
 
-    /** Method to round cents if there are more than 2 digits worth of cents*/
-    private void roundCents() {
-
-    }
-
     public int getDollars(){
         return this.dollars;
     }
